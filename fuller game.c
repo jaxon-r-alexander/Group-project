@@ -854,13 +854,16 @@ void combat(Player *player, Enemy *enemy) {
         scanf("%d", &playerChoice);
 
                     switch (playerChoice) {
-                        case 1: // Attack
-                            printf("\nYou strike at the %s!\n", enemy->name);
-                                findBestWeapon(player);
-                                    int bestWeaponDamage = findBestWeapon(player);
-                                enemy->health -= bestWeaponDamage;
-                            printf("The %s has %d health remaining!\n\n", enemy->name, enemy->health);
-                        break;
+                        case 1: 
+    printf("\nYou strike at the %s!\n", enemy->name);
+    int bestWeaponDamage = findBestWeapon(player);
+    enemy->health -= bestWeaponDamage;
+    if (enemy->health <= 0) {
+        printf("You have slain the %s!\n\n", enemy->name);
+        enemy->isAlive = 0;
+        return;
+    }
+    break;
                 
                 if (enemy->health <= 0) {
                     printf("You have slain the %s!\n\n", enemy->name);
