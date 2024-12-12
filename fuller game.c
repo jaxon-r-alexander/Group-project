@@ -1304,6 +1304,7 @@ void lichEncounter(Player *player) {
     }
 }
 
+
 void kingEncounter(Player *player){ // Label for the main King encounter logic
     int choice;
 
