@@ -1137,6 +1137,7 @@ void farmersField(Player *player) {
             if (oldMan.quest.isActive && !oldMan.quest.isCompleted) {
                 printf("\nThe farmer says: \"The troll lives in a cave near the river to the east. Be careful, traveler!\"\n");
                 printf("You now have an active quest: %s\n", oldMan.quest.description);
+                farmersField(player);
                 return;
             }
 
@@ -1181,6 +1182,45 @@ void checkActiveQuests(Player *player, struct NPC *npc) {
         printf("Reward: %d gold\n", npc->quest.rewardGold);
     }
 }
+
+void kingdomSquare(Player *player) {
+    int choice;
+    printf("\nYou step into the Kingdom Square, a vibrant green space filled with blooming flowers, neatly trimmed hedges, and sparkling fountains.\n");
+    printf("The air is fragrant with the scent of roses, and the square is bustling with activity as nobles and citizens stroll through, enjoying the luxury.\n");
+    printf("A grand staircase to the east leads to the Throne Room, while paths to the north and west lead to the Graveyard and the Mountains, respectively.\n\n");
+
+    do {
+        printf("Where would you like to go?\n");
+        printf("1. Enter the Throne Room\n");
+        printf("2. Head to the Graveyard\n");
+        printf("3. Return to the Mountains\n");
+        printf("4. Stay in the Kingdom Square a little longer\n");
+        printf("Your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("\nYou walk up the grand staircase and push open the heavy doors to the Throne Room.\n");
+                kingEncounter(player);
+                return;
+            case 2:
+                printf("\nYou follow the cobblestone path north, which grows darker and quieter as you approach the Graveyard.\n");
+                graveyardEncounter(player);
+                return;
+            case 3:
+                printf("\nYou retrace your steps west, climbing back into the rugged Mountains.\n");
+                mountainsEncounter(player);
+                return;
+            case 4:
+                printf("\nYou take a moment to soak in the beauty of the Kingdom Square. The lavish surroundings remind you of the grandeur of this kingdom.\n");
+                break;
+            default:
+                printf("\nInvalid choice. Please choose again.\n");
+        }
+    } while (1);
+}
+
+
 void kingEncounter(Player *player){ // Label for the main King encounter logic
     int choice;
 
