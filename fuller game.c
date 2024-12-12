@@ -108,7 +108,8 @@ void intro(Player *player) {
 
     // Copy name to player structure
     strncpy(player->name, tempName, MAX_NAME_LENGTH);
-    player->name[MAX_NAME_LENGTH] = '\0';  // Ensure null termination
+    player->name[MAX_NAME_LENGTH - 1] = '\0'; // Ensure null termination
+
     
     printf("\nWell, %s, good luck.\n\nYou find yourself in a cozy tavern, seemingly waking from a dream\n\n", player->name);
     
