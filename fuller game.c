@@ -64,6 +64,7 @@ void interactWithNPC(Player *player, struct NPC *npc);
 void townSquare(Player *player);
 void oldLadyBridge(Player *player);
 void bridgeEncounter(Player *player);
+void kingEncounter(Player *player);
 
 int main() {
     Player player;
@@ -736,10 +737,9 @@ void mountainsEncounter(Player *player) {
                     printf("\nThe Crystal Dragon blocks your path, forcing you to deal with it before leaving.\n");
                 } else {
                     printf("\nYou carefully leave the lair and head down the northern path.\n");
-                    printf("The path leads you to a lush valley below, filled with mysterious flora and fauna. Your journey continues...\n\n");
+                    kingEncounter(Player *player);
                     return; // Exit the encounter
                 }
-                break;
 
             case 5:
                 printf("\nYou decide to leave the mountain quietly and return to where you started.\n");
@@ -1133,7 +1133,7 @@ void checkActiveQuests(Player *player, struct NPC *npc) {
         printf("Reward: %d gold\n", npc->quest.rewardGold);
     }
 }
-KingEncounter: // Label for the main King encounter logic
+void kingEncounter(Player *player){ // Label for the main King encounter logic
     do {
         printf("What would you like to do?\n");
         printf("1. Fight the Mighty King\n");
