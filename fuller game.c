@@ -1030,68 +1030,26 @@ void pickUpItem(Player *player, Room *room) {
 
 void interactWithNPC(Player *player, struct NPC *npc) {
     printf("\n%s says: %s\n", npc->name, npc->dialogue);
-    
+
     if (npc->hasQuest) {
         if (!npc->quest.isActive && !npc->quest.isCompleted) {
             printf("\nWill you accept this quest? (1: Yes, 2: No): ");
             int choice;
             scanf("%d", &choice);
-            
-            if (choice == 1 && NPC.name == "Wounded Knight") {
-                // Initialize quest details only after player accepts
-                npc->quest = (struct Quest){
-                    .isActive = 1,
-                    .isCompleted = 0,
-                    .rewardGold = 150,
-                };
-                strcpy(npc->quest.targetItem, "Lich's Head");
-                strcpy(npc->quest.description, "Defeat the Lich King and bring back his head as proof");
-                
+
+            if (choice == 1) {
+                npc->quest.isActive = 1; // Activate quest
                 printf("\nQuest accepted: %s\n", npc->quest.description);
                 printf("Reward: %d gold\n", npc->quest.rewardGold);
             }
-            else{
-                npc->quest = (struct Quest){
-                    .isActive = 1,
-                    .isCompleted = 0,
-                    .rewardGold = 150,
-                };
-                strcpy(npc->quest.targetItem, "Troll's Key");
-                strcpy(npc->quest.description, "Retrieve the key stolen by the troll and return it to the old farmer.");
-                
-                printf("\nQuest accepted: %s\n", npc->quest.description);
-                printf("Reward: %d gold\n", npc->quest.rewardGold);
-            }
+        } else if (npc->quest.isActive && !npc->quest.isCompleted) {
+            printf("\n%s says: 'Remember, you must bring me the %s to complete the quest.'\n",
+                   npc->name, npc->quest.targetItem);
+        } else if (npc->quest.isCompleted) {
+            printf("\n%s nods at you with respect: 'Thank you for completing the quest.'\n", npc->name);
         }
-        else if (npc->quest.isActive && !npc->quest.isCompleted) {
-            // Check if player has the Lich's Head
-            for (int i = 0; i < player->itemCount; i++) {
-                if (strcmp(player->inventory[i], "Lich's Head") == 0) {
-                    printf("\nYou present the Lich's Head to the wounded knight.\n");
-                    printf("'You... you actually did it! The realm is safer thanks to your bravery.'\n");
-                    
-                    // Remove the Lich's Head from inventory
-                    for (int j = i; j < player->itemCount - 1; j++) {
-                        strcpy(player->inventory[j], player->inventory[j + 1]);
-                    }
-                    player->itemCount--;
-                    
-                    // Give reward
-                    player->gold += npc->quest.rewardGold;
-                    printf("\nReceived %d gold!\n", npc->quest.rewardGold);
-                    printf("Current gold: %d\n", player->gold);
-                    
-                    npc->quest.isCompleted = 1;
-                    npc->quest.isActive = 0;
-                    strcpy(npc->dialogue, "Thank you for defeating the Lich King. The realm is in your debt.");
-                    return;
-                }
-            }
-            printf("\n'Remember, bring me the Lich's Head as proof of your victory.'\n");
-        }
-        else if (npc->quest.isCompleted) {
-            printf("\nThe knight nods at you with respect.\n");
-        }
+    } else {
+        printf("\n%s has no quest for you.\n", npc->name);
     }
 }
 
