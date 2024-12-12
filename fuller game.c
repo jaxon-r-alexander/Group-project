@@ -737,7 +737,7 @@ void mountainsEncounter(Player *player) {
                     printf("\nThe Crystal Dragon blocks your path, forcing you to deal with it before leaving.\n");
                 } else {
                     printf("\nYou carefully leave the lair and head down the northern path.\n");
-                    kingEncounter(Player *player);
+                    kingEncounter(player);
                     return; // Exit the encounter
                 }
 
@@ -1029,6 +1029,8 @@ void pickUpItem(Player *player, Room *room) {
 }
 
 void interactWithNPC(Player *player, struct NPC *npc) {
+    int checkAndRemoveItem(Player *player, const char *item);
+
     printf("\n%s says: %s\n", npc->name, npc->dialogue);
 
     if (npc->hasQuest) {
@@ -1066,6 +1068,7 @@ void interactWithNPC(Player *player, struct NPC *npc) {
             if (checkAndRemoveItem(player, npc->quest.targetItem)) {
                 printf("\nYou present the %s to %s.\n", npc->quest.targetItem, npc->name);
                 printf("'Thank you! You've helped me greatly.'\n");
+
 
                 player->gold += npc->quest.rewardGold;
                 printf("\nReceived %d gold!\n", npc->quest.rewardGold);
