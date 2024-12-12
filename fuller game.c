@@ -24,7 +24,9 @@ typedef struct Room {
     char item[50];
     int hasItem;
     int locked;
+    int isCleared; // Flag to indicate if enemies in the room are defeated
 } Room;
+
 
 typedef struct Enemy {
     char name[50];
