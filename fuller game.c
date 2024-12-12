@@ -838,22 +838,23 @@ void combat(Player *player, Enemy *enemy) {
         printf("What will you do? ");
         scanf("%d", &playerChoice);
 
-        switch (playerChoice) {
-            case 1: // Attack
-                printf("\nYou strike at the %s!\n", enemy->name);
-                int findBestWeapon(Player *player) {
-    int bestDamage = 0;
-    for (int i = 0; i < player->itemCount; i++) {
-        for (int j = 0; j < numWeapons; j++) {
-            if (strcmp(player->inventory[i], availableWeapons[j].name) == 0) {
-                if (availableWeapons[j].damage > bestDamage) {
-                    bestDamage = availableWeapons[j].damage;
+                    switch (playerChoice) {
+                        case 1: // Attack
+                            printf("\nYou strike at the %s!\n", enemy->name);
+                            int findBestWeapon(Player *player) {
+                            int bestDamage = 0;
+                            for (int i = 0; i < player->itemCount; i++) {
+                            for (int j = 0; j < numWeapons; j++) {
+                            if (strcmp(player->inventory[i], availableWeapons[j].name) == 0) {
+                            if (availableWeapons[j].damage > bestDamage) {
+                                bestDamage = availableWeapons[j].damage;
+                            }
+                        }
+                    }
                 }
+                return bestDamage > 0 ? bestDamage : availableWeapons[0].damage; // Default to "Fist" if no weapon
             }
-        }
-    }
-    return bestDamage > 0 ? bestDamage : availableWeapons[0].damage; // Default to "Fist" if no weapon
-}
+
                 enemy->health -= bestWeaponDamage;
                 printf("The %s has %d health remaining!\n\n", enemy->name, enemy->health);
                 
