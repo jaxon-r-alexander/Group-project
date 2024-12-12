@@ -576,7 +576,7 @@ void bridgeEncounter(Player *player) {
                 printf("As you do, a massive figure emerges from beneath the bridge! It's a Bridge Troll!\n");
                 printf("The troll growls, \"Pay the toll or face my wrath!\"\n\n");
                 trollEncounter(player, &bridgeTroll, &bridgeRoom);
-                bridgeRoom(player);
+                bridgeEncounter(player);
                 return;
 
             default:
@@ -605,7 +605,7 @@ void trollEncounter(Player *player, Enemy *bridgeTroll, Room *bridgeRoom) {
 
                     // Check if the troll has an item (the key) to collect
                     if (bridgeRoom->hasItem) {
-                        printf("As you stand victourious, you see something taped around the trolls neck. What do you do?\n\n")
+                        printf("As you stand victourious, you see something taped around the trolls neck. What do you do?\n\n");
                         printf("1. Inspect\n\n");
                         printf("2. Go back to bridge entrance\n\n");
                         printf("3. Head up the mountain\n\n");
