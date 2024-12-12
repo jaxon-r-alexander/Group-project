@@ -1037,7 +1037,7 @@ void interactWithNPC(Player *player, struct NPC *npc) {
             int choice;
             scanf("%d", &choice);
             
-            if (choice == 1) {
+            if (choice == 1 && NPC.name == "Wounded Knight") {
                 // Initialize quest details only after player accepts
                 npc->quest = (struct Quest){
                     .isActive = 1,
@@ -1046,6 +1046,18 @@ void interactWithNPC(Player *player, struct NPC *npc) {
                 };
                 strcpy(npc->quest.targetItem, "Lich's Head");
                 strcpy(npc->quest.description, "Defeat the Lich King and bring back his head as proof");
+                
+                printf("\nQuest accepted: %s\n", npc->quest.description);
+                printf("Reward: %d gold\n", npc->quest.rewardGold);
+            }
+            else{
+                npc->quest = (struct Quest){
+                    .isActive = 1,
+                    .isCompleted = 0,
+                    .rewardGold = 150,
+                };
+                strcpy(npc->quest.targetItem, "Troll's Key");
+                strcpy(npc->quest.description, "Retrieve the key stolen by the troll and return it to the old farmer.");
                 
                 printf("\nQuest accepted: %s\n", npc->quest.description);
                 printf("Reward: %d gold\n", npc->quest.rewardGold);
