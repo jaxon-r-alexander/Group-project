@@ -83,6 +83,7 @@ void kingdomSquare(Player *player);
 void lichEncounter(Player *player);
 void graveyardSearch(Player *player);
 int findBestWeapon(Player *player);
+void trollEncounter(Player *player);
 
 int main() {
     Player player;
