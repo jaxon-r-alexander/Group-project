@@ -8,26 +8,6 @@
 #define MAX_DESCRIPTION_LENGTH 200
 #define MAX_INVENTORY_SIZE 30
 
-// Function prototypes
-void initializeWoundedSoldier();
-void initializeOldMan();
-void intro(Player *player);
-void Tavern(Player *player);
-void townSquare(Player *player);
-void explorePath(Player *player);
-void farmersField(Player *player);
-void riverCrossing(Player *player);
-void bridgeEncounter(Player *player);
-void kingEncounter(Player *player);
-void lichEncounter(Player *player);
-void combat(Player *player, Enemy *enemy, Room *room);
-void printInventory(Player *player);
-void pickUpItem(Player *player, Room *room);
-void interactWithNPC(Player *player, struct NPC *npc);
-int checkAndRemoveItem(Player *player, const char *item);
-void handleRoomWithEnemies(Player *player, Room *room, Enemy *enemy);
-
-
 typedef struct {
     char name[MAX_NAME_LENGTH];
     int health;
@@ -44,9 +24,7 @@ typedef struct Room {
     char item[50];
     int hasItem;
     int locked;
-    int isCleared; // Flag to indicate if enemies in the room are defeated
 } Room;
-
 
 typedef struct Enemy {
     char name[50];
@@ -82,48 +60,36 @@ Weapon availableWeapons[] = {
 };
 const int numWeapons = sizeof(availableWeapons) / sizeof(Weapon);
 
-struct NPC oldMan = {
-    .name = "Old Farmer",
-    .dialogue = "Hello traveler! I need your help. A troll has stolen a key I was entrusted with by a knight. Please, retrieve it for me!\n\n",
-    .hasQuest = 1,
-    .quest = {
-        .isActive = 0,
-        .isCompleted = 0,
-        .rewardGold = 50,
-    }
-};
 
 
-struct NPC woundedSoldier = {
-    .name = "Wounded Soldier",
-    .dialogue = "I was part of an elite squad tasked with defeating the Lich King in the graveyard across the river. My companions... they didn't make it. Will you do what we couldn't and kill the Lich?",
-    .hasQuest = 1,
-    .quest = {
-        .isActive = 0,
-        .isCompleted = 0,
-        .rewardGold = 150,
-    }
-};
-
-
-
-
-void initializeWoundedSoldier() {
-    strcpy(woundedSoldier.quest.targetItem, "Lich's Head");
-    strcpy(woundedSoldier.quest.description, "Defeat the Lich King and bring back his head as proof.");
-}
-void initializeOldMan() {
-    strcpy(oldMan.quest.targetItem, "Troll's Key");
-    strcpy(oldMan.quest.description, "Retrieve the key stolen by the troll and return it to the old farmer.\n\n");
-}
-
+void intro(Player *player);
+void Tavern(Player *player);
+void mountainsEncounter(Player *player);
+void explorePath(Player *player);
+void riverCrossing(Player *player);
+void caveEncounter(Player *player);
+void farmersField(Player *player);
+void combat(Player *player, Enemy *enemy);
+void printInventory(Player *player);
+void pickUpItem(Player *player, Room *room);
+void unlockRoom(Player *player, Room *room);
+void shop(Player *player);
+void interactWithNPC(Player *player, struct NPC *npc);
+void townSquare(Player *player);
+void oldLadyBridge(Player *player);
+void bridgeEncounter(Player *player);
+void kingEncounter(Player *player);
+void kingdomSquare(Player *player);
+void lichEncounter(Player *player);
+void graveyardSearch(Player *player);
+int findBestWeapon(Player *player);
+void trollEncounter(Player *player, Enemy *enemy, Room *room);
 
 int main() {
     Player player;
     intro(&player);
     srand(time(NULL));
-    initializeOldMan();
-    initializeWoundedSoldier();
+
     
     int choice;
 
@@ -463,55 +429,120 @@ void riverCrossing(Player *player) {
     }
 }
 
-void caveEncounter(Player *player, Room *room) {
-    // Ensure the room pointer is valid
-    if (!room) {
-        printf("\nError: Room data not found.\n");
-        return;
-    }
+void caveEncounter(Player *player) {
+    Enemy goblin = {"Goblin", 30, 1};
+    Room cave = {
+        .name = "Ancient Cave",
+        .description = "a weathered stone door in the shape of a circle. Looks like it hasn't been opened in ages.",
+        .item = "Ancient Amulet",
+        .hasItem = 1,
+        .locked = 1
+    };
 
-    printf("\nYou enter the %s.\n", room->name);
+    struct NPC soldier = {
+        .name = "Wounded Knight",
+        .dialogue = "I was part of an elite squad tasked with defeating the Lich King in the graveyard across that river. My companions... they didn't make it. Will you do what we couldn't and kill the Lich?",
+        .hasQuest = 1,
+        .quest = {
+            .isActive = 0,
+            .isCompleted = 0,
+            .rewardGold = 150
+        }
+    };
+    strcpy(soldier.quest.targetItem, "Lich's Head");
+    strcpy(soldier.quest.description, "Defeat the Lich King and bring back his head as proof.");
 
-    // Adjust behavior based on the room's state
-    switch (room->isCleared) {
-        case 0: // Room not cleared
-            printf("\n%s\n", room->description);
+    int choice;
+    printf("\nYou arrive at the cave entrance. The air grows colder here, and a small campfire casts shadows on the ancient stone walls. Beside it sits a wounded knight, his armor bearing the crest of the Royal Guard.\n\n");
 
-            // Spawn and engage the enemy
-            Enemy goblin = {"Goblin", 30, 1};
-            printf("\nA %s appears!\n", goblin.name);
-            combat(player, &goblin, room);
+    do {
+        printf("What would you like to do?\n");
+        printf("1. Examine the cave entrance\n");
+        printf("2. Speak with the wounded knight\n");
+        printf("3. Open inventory\n");
+        printf("4. Continue east towards the river\n");
+        printf("5. Return to the previous path\n");
+        printf("Your choice: ");
+        scanf("%d", &choice);
 
-            // If enemy is defeated, mark the room as cleared
-            if (!goblin.isAlive) {
-                room->isCleared = 1;
-                printf("\nThe %s is now safe.\n", room->name);
-            }
-            break;
+        switch (choice) {
+            case 1:
+                printf("\nYou approach the entrance, you see %s\n\n", cave.description);
+                if (cave.locked) {
+                    printf("The door is sealed by an overgrown lock. Perhaps a special key would help?\n\n");
+                    unlockRoom(player, &cave);
+                    if (!cave.locked) {
+                        printf("The lock falls off as the door slowly opens, revealing a dark passage beyond.\n\n");
+                        printf("Do you wish to enter? (1 for Yes, 2 for No): ");
+                        int enterChoice;
+                        scanf("%d", &enterChoice);
+                        if (enterChoice == 1) {
+                            printf("\nYou step into the darkness...\n\n");
+                            combat(player, &goblin);
+                            if (goblin.isAlive == 0) {
+                                printf("\nThe goblin is defeated!\n");
+                            }
 
-        case 1: // Room cleared
-            printf("\nThe %s is quiet. The enemies here have already been defeated.\n", room->name);
+                            if (cave.hasItem) {
+                                printf("You see something sparkling on the ground. Do you want to inspect it? (1 for Yes, 2 for No): ");
+                                int itemChoice;
+                                scanf("%d", &itemChoice);
+                                if (itemChoice == 1) {
+                                    pickUpItem(player, &cave);
+                                } else {
+                                    printf("\nYou leave the item untouched.\n");
+                                }
+                            }
 
-            if (room->hasItem) {
-                printf("\nYou notice something on the ground: %s.\n", room->item);
-                printf("Do you want to pick it up? (1: Yes, 2: No): ");
-                int choice;
-                scanf("%d", &choice);
-
-                if (choice == 1) {
-                    pickUpItem(player, room);
+                            // Deeper exploration of the cave
+                            printf("\nDeeper in the cave, you find yourself in a dimly lit chamber.\n");
+                            printf("What would you like to do?\n");
+                            printf("1. Continue deeper into the cave\n");
+                            printf("2. Return to the cave entrance\n");
+                            int deeperChoice;
+                            scanf("%d", &deeperChoice);
+                            if (deeperChoice == 1) {
+                                printf("\nThe cave slowly gets smaller until you find a wall. You must go back.\n\n");
+                                caveEncounter(player);
+                            } else if (deeperChoice == 2) {
+                                printf("\nYou exit the cave and return to the entrance.\n");
+                            }
+                        } else {
+                            printf("\nYou decide not to enter the cave for now.\n");
+                        }
+                    }
                 } else {
-                    printf("\nYou leave the item untouched.\n");
+                    printf("\nThe cave entrance is already unlocked. You may enter if you wish.\n");
                 }
-            }
-            break;
+                break;
 
-        default:
-            printf("\nThe room state is unknown. Please report this bug!\n");
-            break;
-    }
+            case 2:
+                printf("\nYou walk over to the campfire. The wounded knight seems lost in thought but notices you as you approach.\n");
+                interactWithNPC(player, &soldier);
+                if (soldier.quest.isActive && !soldier.quest.isCompleted) {
+                    printf("\nThe knight says: \"Be warned, traveler. The Lich's power grows stronger with each soul he claims.\"\n");
+                }
+                break;
+
+            case 3:
+                printInventory(player);
+                break;
+
+            case 4:
+                printf("\nYou decide to leave the cave and head towards the river.\n");
+                oldLadyBridge(player);  // Assuming the bridge is the next logical step
+                return;
+
+            case 5:
+                printf("\nYou decide to return to the previous path.\n\n");
+                explorePath(player);
+                return;
+
+            default:
+                printf("\nInvalid choice. Please choose again.\n");
+        }
+    } while (1);
 }
-
 
 void bridgeEncounter(Player *player) {
     Enemy bridgeTroll = {"Bridge Troll", 50, 1};
@@ -558,7 +589,6 @@ void bridgeEncounter(Player *player) {
                 printf("As you do, a massive figure emerges from beneath the bridge! It's a Bridge Troll!\n");
                 printf("The troll growls, \"Pay the toll or face my wrath!\"\n\n");
                 trollEncounter(player, &bridgeTroll, &bridgeRoom);
-                bridgeEncounter(player);
                 return;
 
             default:
@@ -587,35 +617,8 @@ void trollEncounter(Player *player, Enemy *bridgeTroll, Room *bridgeRoom) {
 
                     // Check if the troll has an item (the key) to collect
                     if (bridgeRoom->hasItem) {
-                        printf("As you stand victourious, you see something taped around the trolls neck. What do you do?\n\n");
-                        printf("1. Inspect\n\n");
-                        printf("2. Go back to bridge entrance\n\n");
-                        printf("3. Head up the mountain\n\n");
-                        scanf("%d", &choice);
-                        if (choice == 1){
                         pickUpItem(player, bridgeRoom);
-                        printf("\nYou found the Troll's Key on its body! You can talk to the old man now!\n\n");
-                        printf("What do you do now?\n\n");
-                        printf("1. Go back to bridge entrance\n\n");
-                        printf("2. Head up the mountain\n\n");
-                        scanf("%d", &choice);
-                        if (choice == 1){
-                            bridgeEncounter(player);
-                            return;
-                        } else if (choice == 2){
-                            mountainsEncounter(player);
-                         return;
-                        } else {
-                            printf("Invalid Number, try again");
-                        }
-                        } else if (choice == 2){
-                            bridgeEncounter(player);
-                            return;
-                        } else if (choice == 3){
-                            mountainsEncounter(player);
-                         return;
-                        }
-
+                        printf("\nYou found the Troll's Key on its body! It might be important later.\n");
                     } else {
                         printf("\nThe troll seems to have nothing of value left.\n");
                     }
@@ -652,7 +655,6 @@ void trollEncounter(Player *player, Enemy *bridgeTroll, Room *bridgeRoom) {
 
                 if (fleeNumber == correctFleeNumber) {
                     printf("\nYou sprint past the troll and make it across the bridge safely!\n");
-                    mountainsEncounter(player);
                     return;
                 } else {
                     printf("\nThe troll blocks your escape and roars, \"Coward! Face me!\"\n");
@@ -873,64 +875,156 @@ void oldLadyBridge(Player *player) {
     } while (1);
 }
 
-void combat(Player *player, Enemy *enemy, Room *room) {
+void combat(Player *player, Enemy *enemy) {
     if (!enemy->isAlive) {
-        printf("\nThe %s is already defeated.\n", enemy->name);
+        printf("\nThe %s is already dead.\n\n", enemy->name);
         return;
     }
+    
+    printf("\nA %s lunges from the shadows! It has %d health.\n\n", enemy->name, enemy->health);
+    int escapeNumber, dodgeNumber, playerChoice;
 
-    printf("\nA %s lunges at you!\n", enemy->name);
+
 
     while (enemy->isAlive && player->health > 0) {
-        printf("\nYour health: %d | %s's health: %d\n", player->health, enemy->name, enemy->health);
-        printf("1. Attack\n2. Open Inventory\n3. Flee\nYour choice: ");
-        int choice;
-        scanf("%d", &choice);
+        printf("\nCombat Options:\n");
+        printf("1. Attack\n");
+        printf("2. Open Inventory\n");
+        printf("3. Block\n");
+        printf("4. Attempt Escape\n\n");
+        printf("What will you do? ");
+        scanf("%d", &playerChoice);
 
-        switch (choice) {
-            case 1: // Attack
-                printf("\nYou attack the %s!\n", enemy->name);
-                int damage = findBestWeapon(player);
-                enemy->health -= damage;
-                printf("You dealt %d damage!\n", damage);
-
+                    switch (playerChoice) {
+                        case 1: 
+    printf("\nYou strike at the %s!\n", enemy->name);
+    int bestWeaponDamage = findBestWeapon(player);
+    enemy->health -= bestWeaponDamage;
+    if (enemy->health <= 0) {
+        printf("You have slain the %s!\n\n", enemy->name);
+        enemy->isAlive = 0;
+        return;
+    }
+    break;
+                
                 if (enemy->health <= 0) {
-                    printf("\nYou defeated the %s!\n", enemy->name);
-                    enemy->isAlive = 0;
-
-                    if (room) {
-                        room->isCleared = 1; // Mark the room as cleared
-                    }
+                    printf("You have slain the %s!\n\n", enemy->name);
+                        enemy->isAlive = 0;
+                    return;
                 }
                 break;
 
-            case 2: // Open Inventory
-                printInventory(player);
+            case 2: // Inventory
+                while (1) {
+                    printInventory(player);
+                    if (player->itemCount > 0) {
+                        printf("\nEnter item number to use (0 to return to combat): ");
+                        int itemChoice;
+                        scanf("%d", &itemChoice);
+                        
+                        if (itemChoice == 0) break;
+                        
+                        if (itemChoice > 0 && itemChoice <= player->itemCount) {
+                            itemChoice--; // Adjust for 0-based array
+                            
+                            // Item usage logic
+                            if (strcmp(player->inventory[itemChoice], "Health Potion") == 0) {
+                                player->health += 20;
+                                printf("\nYou drink the Health Potion. Health restored to %d!\n", player->health);
+                                // Remove used item
+                                for (int i = itemChoice; i < player->itemCount - 1; i++) {
+                                    strcpy(player->inventory[i], player->inventory[i + 1]);
+                                }
+                                player->itemCount--;
+                                break;
+                            }
+                            else if (strcmp(player->inventory[itemChoice], "Damage Potion") == 0) {
+                                enemy->health -= 50;
+                                printf("\nYou throw the Damage Potion! The %s takes 50 damage!\n", enemy->name);
+                                if (enemy->health <= 0) {
+                                    printf("The %s has been defeated!\n\n", enemy->name);
+                                    enemy->isAlive = 0;
+                                    return;
+                                }
+                                // Remove used item
+                                for (int i = itemChoice; i < player->itemCount - 1; i++) {
+                                    strcpy(player->inventory[i], player->inventory[i + 1]);
+                                }
+                                player->itemCount--;
+                                break;
+                            }
+                            else if (strcmp(player->inventory[itemChoice], "Apple") == 0) {
+                                player->health += 5;
+                                printf("\nYou quickly eat the Apple. Health restored to %d!\n", player->health);
+                                // Remove used item
+                                for (int i = itemChoice; i < player->itemCount - 1; i++) {
+                                    strcpy(player->inventory[i], player->inventory[i + 1]);
+                                }
+                                player->itemCount--;
+                                break;
+                            }
+                        }
+                    } else {
+                        printf("\nPress 0 to return to combat: ");
+                        int temp;
+                        scanf("%d", &temp);
+                        if (temp == 0) break;
+                    }
+                }
+                continue; // Skip enemy turn after inventory management
+
+            case 3: // Block
+                printf("\nYou raise your guard, ready to block the next attack!\n");
                 break;
 
-            case 3: // Flee
-                printf("\nYou flee from the battle!\n");
-                return;
+            case 4: // Escape
+                printf("\nYou attempt to escape!\n");
+                printf("Pick a number (1-3): ");
+                scanf("%d", &escapeNumber);
+                
+                int correctEscapeNumber = rand() % 3 + 1;
+                
+                if (escapeNumber == correctEscapeNumber) {
+                    printf("\nYou successfully escape from the battle!\n\n");
+                    return;
+                } else {
+                    printf("\nEscape failed! The %s blocks your path!\n\n", enemy->name);
+                }
+                break;
 
             default:
-                printf("\nInvalid choice. Try again.\n");
+                printf("\nInvalid choice! The %s takes advantage of your hesitation!\n", enemy->name);
+                break;
         }
 
-        // Enemy attacks if still alive
+        // Enemy turn
         if (enemy->isAlive) {
-            printf("\nThe %s attacks you!\n", enemy->name);
-            int enemyDamage = 15;
-            player->health -= enemyDamage;
-            printf("You take %d damage! Current health: %d\n", enemyDamage, player->health);
-
-            if (player->health <= 0) {
-                printf("\nYou have been defeated by the %s. Game Over.\n", enemy->name);
-                exit(0);
+            printf("\nThe %s prepares to attack!\n", enemy->name);
+            printf("Try to dodge! Pick a number (1-2): ");
+            scanf("%d", &dodgeNumber);
+            
+            int correctDodgeNumber = rand() % 2 + 1;
+            
+            if (dodgeNumber == correctDodgeNumber) {
+                printf("\nYou successfully dodge the attack!\n\n");
+            } else {
+                int damage = (playerChoice == 3) ? 0 : 15; // No damage if blocked
+                if (playerChoice == 3) {
+                    printf("\nYou successfully block the attack!\n\n");
+                } else {
+                    player->health -= damage;
+                    printf("\nThe attack hits! You take %d damage!\n", damage);
+                    printf("You have %d health remaining.\n\n", player->health);
+                }
             }
+        }
+
+        if (player->health <= 0) {
+            printf("\nYou have been defeated by the %s. Game Over.\n\n", enemy->name);
+            exit(0);
         }
     }
 }
-
 
 void printInventory(Player *player) {
     if (player->itemCount == 0) {
@@ -945,14 +1039,14 @@ void printInventory(Player *player) {
 
 void pickUpItem(Player *player, Room *room) {
     if (room->hasItem) {
-        if (player->itemCount < MAX_INVENTORY_SIZE) {
+        if (player->itemCount < MAX_INVENTORY_SIZE) {  // Use MAX_INVENTORY_SIZE instead of MAX_INVENTORY
             strcpy(player->inventory[player->itemCount], room->item);
             player->itemCount++;
-            printf("\nYou picked up %s.\n", room->item);
+            printf("\nYou picked up %s\n", room->item);
             room->hasItem = 0;
-            room->item[0] = '\0'; // Clear the item
+            room->item[0] = '\0';  // Clear the item
         } else {
-            printf("\nYour inventory is full! You cannot pick up %s.\n", room->item);
+            printf("\nYour inventory is full!\n");
         }
     } else {
         printf("\nThere is nothing to pick up here.\n");
@@ -960,175 +1054,239 @@ void pickUpItem(Player *player, Room *room) {
 }
 
 void interactWithNPC(Player *player, struct NPC *npc) {
+    int checkAndRemoveItem(Player *player, const char *item);
+
     printf("\n%s says: %s\n", npc->name, npc->dialogue);
 
     if (npc->hasQuest) {
-        if (npc->quest.isActive && !npc->quest.isCompleted) {
-            // Check if the player has the required item
-            if (checkAndRemoveItem(player, npc->quest.targetItem)) {
-                // Complete the quest
-                printf("\nYou present the %s to %s.\n", npc->quest.targetItem, npc->name);
-                printf("%s smiles and says, 'Thank you! You've helped me greatly.'\n", npc->name);
-
-                player->gold += npc->quest.rewardGold; // Reward the player
-                printf("\nYou received %d gold! Current gold: %d\n", npc->quest.rewardGold, player->gold);
-
-                npc->quest.isCompleted = 1; // Mark quest as completed
-                npc->quest.isActive = 0;   // Deactivate quest
-                strncpy(npc->dialogue, "Thank you for completing the quest!", sizeof(npc->dialogue));
-            } else {
-                // Player does not have the item
-                printf("\n'%s says: \"Remember, bring me the %s as proof of your success.\"\n", npc->name, npc->quest.targetItem);
-            }
-        } else if (!npc->quest.isActive && !npc->quest.isCompleted) {
-            // Offer the quest if not active and not completed
-            printf("\nThis NPC has a quest for you: %s\n", npc->quest.description);
-            printf("Reward: %d gold\n", npc->quest.rewardGold);
-            printf("Will you accept the quest? (1: Yes, 2: No): ");
+        if (!npc->quest.isActive && !npc->quest.isCompleted) {
+            printf("\nThis NPC has a quest for you. Will you accept it? (1: Yes, 2: No): ");
             int choice;
-            scanf("%d", &choice);
+            if (scanf("%d", &choice) != 1 || (choice != 1 && choice != 2)) {
+                printf("\nInvalid choice. Please try again.\n");
+                return;
+            }
 
             if (choice == 1) {
-                npc->quest.isActive = 1;
-                printf("\nQuest accepted: %s\n", npc->quest.description);
+                // Assign quest details dynamically based on the NPC
+                if (strcmp(npc->name, "Wounded Knight") == 0) {
+                    npc->quest.isActive = 1;
+                    npc->quest.isCompleted = 0;
+                    npc->quest.rewardGold = 150;
+                    strncpy(npc->quest.targetItem, "Lich's Head", sizeof(npc->quest.targetItem));
+                    strncpy(npc->quest.description, "Defeat the Lich King and bring back his head as proof", sizeof(npc->quest.description));
+
+                    printf("\nQuest accepted: %s\n", npc->quest.description);
+                    printf("Reward: %d gold\n", npc->quest.rewardGold);
+                } else if (strcmp(npc->name, "Old Farmer") == 0) {
+                    npc->quest.isActive = 1;
+                    npc->quest.isCompleted = 0;
+                    npc->quest.rewardGold = 100;
+                    strncpy(npc->quest.targetItem, "Goblin Key", sizeof(npc->quest.targetItem));
+                    strncpy(npc->quest.description, "Retrieve the Goblin Key stolen by goblins.", sizeof(npc->quest.description));
+
+                    printf("\nQuest accepted: %s\n", npc->quest.description);
+                    printf("Reward: %d gold\n", npc->quest.rewardGold);
+                }
+            }
+        } else if (npc->quest.isActive && !npc->quest.isCompleted) {
+            if (checkAndRemoveItem(player, npc->quest.targetItem)) {
+                printf("\nYou present the %s to %s.\n", npc->quest.targetItem, npc->name);
+                printf("'Thank you! You've helped me greatly.'\n");
+
+
+                player->gold += npc->quest.rewardGold;
+                printf("\nReceived %d gold!\n", npc->quest.rewardGold);
+                printf("Current gold: %d\n", player->gold);
+
+                npc->quest.isCompleted = 1;
+                npc->quest.isActive = 0;
+                strncpy(npc->dialogue, "Thank you for completing the quest!", sizeof(npc->dialogue));
             } else {
-                printf("\nYou declined the quest.\n");
+                printf("\n'Remember, bring me the %s as proof of your success.'\n", npc->quest.targetItem);
             }
         } else if (npc->quest.isCompleted) {
-            // Quest already completed
-            printf("\n%s nods at you with respect and says, 'Thank you again for your help.'\n", npc->name);
+            printf("\n%s nods at you with respect.\n", npc->name);
         }
-    } else {
-        printf("\n%s has nothing more to ask of you.\n", npc->name);
     }
 }
 
 int checkAndRemoveItem(Player *player, const char *item) {
     for (int i = 0; i < player->itemCount; i++) {
         if (strcmp(player->inventory[i], item) == 0) {
-            // Shift remaining items to remove the found item
+            // Remove item by shifting the rest
             for (int j = i; j < player->itemCount - 1; j++) {
-                strcpy(player->inventory[j], player->inventory[j + 1]);
-            }
-            player->itemCount--; // Reduce item count
-            printf("\nYou handed over the %s.\n", item);
+    strncpy(player->inventory[j], player->inventory[j + 1], sizeof(player->inventory[j]));
+}
+player->inventory[player->itemCount - 1][0] = '\0'; // Clear the last item
+
             return 1; // Item found and removed
         }
     }
-    printf("\nYou don't have the required item: %s\n", item);
     return 0; // Item not found
 }
 
 void farmersField(Player *player) {
-    static Room farmField = {
-        .name = "Farmer's Field",
-        .description = "A vast field with golden wheat swaying gently in the breeze. An old farmhouse stands nearby.",
-        .item = "",
-        .hasItem = 0,
-        .locked = 0,
-        .isCleared = 0 // Initially not cleared
-    };
-
-    static Enemy scarecrow = {"Enchanted Scarecrow", 40, 1}; // Enemy in this room, if any
-
     int choice;
 
-    // Adjust behavior based on the room's state
-    switch (farmField.isCleared) {
-        case 0: // Room not cleared
-            printf("\nYou arrive at the %s. %s\n", farmField.name, farmField.description);
+    // Initialize the old man as an NPC with a quest
+    struct NPC oldMan = {
+        .name = "Old Farmer",
+        .dialogue = "Hello traveler! I need your help. A troll has stolen a key I was entrusted with by a knight. Please, retrieve it for me!\n\n",
+        .hasQuest = 1,
+        .quest = {
+            .isActive = 0,
+            .isCompleted = 0,
+            .rewardGold = 50,
+        }
+    };
+    strcpy(oldMan.quest.targetItem, "Troll's Key");
+    strcpy(oldMan.quest.description, "Retrieve the key stolen by the troll and return it to the old farmer.\n\n");
 
-            // Check if the Old Farmer's quest is active or completed
-            if (oldMan.quest.isCompleted) {
-                printf("\nThe farmer smiles warmly: \"Thank you again for retrieving the key. I have nothing else for you now.\"\n");
-            } else {
-                printf("\nAn old man is trying to get your attention.\n");
-                printf("\nWhat would you like to do?\n");
-                printf("1. Talk to the farmer\n");
-                printf("2. Ignore the farmer and continue towards the bridge\n");
-                printf("3. Go back to the main path\n");
-                printf("Your choice: ");
-                scanf("%d", &choice);
+    if (oldMan.quest.isActive && !oldMan.quest.isCompleted) {
+                    printf("\nThe farmer says: \"The troll lives under the bridge on the river to the east. Be careful, traveler!\"\n");
+                    printf("You now have an active quest: %s\n\n", oldMan.quest.description);
 
-                switch (choice) {
-                    case 1:
-                        // Interact with the farmer (NPC)
-                        interactWithNPC(player, &oldMan);
+                    while (1) { // Loop for choices after accepting the quest
+                        printf("\nWhat would you like to do?\n");
+                        printf("1. Talk to the farmer again.\n");
+                        printf("2. Continue towards the Troll.\n");
+                        printf("3. Go back to the pathway.\n");
+                        printf("Your choice: ");
+                        scanf("%d", &choice);
 
-                        // After interaction, check if the quest is active and the player hasn't already fought the scarecrow
-                        if (oldMan.quest.isActive && !farmField.isCleared) {
-                            // Enemy encounter (optional, if you want an enemy here)
-                            printf("\nAs you finish speaking with the farmer, an %s lurches towards you from the field!\n", scarecrow.name);
-                            combat(player, &scarecrow, &farmField);
-
-                            if (!scarecrow.isAlive) {
-                                farmField.isCleared = 1; // Mark the field as cleared
-                                printf("\nThe %s collapses into a heap of straw.\n", scarecrow.name);
-                            }
+                        if (choice == 1) {
+                            interactWithNPC(player, &oldMan);
+                            farmersField(player);
+                            return;
+                        } else if (choice == 2) {
+                            bridgeEncounter(player);
+                            return;
+                        } else if (choice == 3) {
+                            explorePath(player);
+                            return;
+                        } else {
+                            printf("\nInvalid choice. Please try again.\n");
                         }
-                        break;
-
-                    case 2:
-                        // Continue towards the bridge (troll encounter)
-                        printf("\nYou decide to head east towards the troll's bridge.\n");
-                        bridgeEncounter(player);
-                        return;
-
-                    case 3:
-                        // Go back to the main path
-                        printf("\nYou decide to return to the main path.\n");
-                        explorePath(player);
-                        return;
-
-                    default:
-                        printf("\nInvalid choice. Please try again.\n");
+                    }
                 }
-            }
-            break;
+            if (oldMan.quest.isCompleted && oldMan.hasQuest == 1) { // Handle quest completion
+                    printf("\nThe farmer smiles warmly: \"Thank you, traveler, for retrieving the key. Here's your reward!\"\n");
+                    player->gold += oldMan.quest.rewardGold;
+                    printf("You received %d gold. Current gold: %d\n", oldMan.quest.rewardGold, player->gold);
+                    oldMan.hasQuest = 0; // No more quests from this NPC
+                    while (1) { // Loop for choices after accepting the quest
+                        printf("\nWhat would you like to do?\n");
+                        printf("1. Talk to the farmer again.\n");
+                        printf("2. Continue towards the Bridge.\n");
+                        printf("3. Go back to the pathway.\n");
+                        printf("Your choice: ");
+                        scanf("%d", &choice);
 
-        case 1: // Room cleared
-            printf("\nYou return to the %s. The field is peaceful, and the farmer is tending to his crops.\n", farmField.name);
+                        if (choice == 1) {
+                            interactWithNPC(player, &oldMan);
+                        } else if (choice == 2) {
+                            bridgeEncounter(player);
+                            return;
+                        } else if (choice == 3) {
+                            explorePath(player);
+                            return;
+                        } else {
+                            printf("\nInvalid choice. Please try again.\n");
+                        }
+                    }
+                }
+                if (oldMan.quest.isCompleted && oldMan.hasQuest == 0){
+                    printf("\nThe farmer smiles warmly: \"Thank you, traveler, for retrieving the key. You helped me so much.\"\n");
+                while (1) { // Loop for choices after accepting the quest
+                        printf("\nWhat would you like to do?\n");
+                        printf("1. Talk to the farmer again.\n");
+                        printf("2. Continue towards the Bridge.\n");
+                        printf("3. Go back to the pathway.\n");
+                        printf("Your choice: ");
+                        scanf("%d", &choice);
 
-            if (oldMan.quest.isCompleted) {
-                printf("\nThe farmer waves at you: \"Thanks again for your help!\"\n");
-            } else if (oldMan.quest.isActive) {
-                printf("\nThe farmer reminds you: \"The troll lives under the bridge on the river to the east. Be careful, traveler!\"\n");
-            } else {
-                printf("\nAn old man is working in the field.\n");
-            }
+                        if (choice == 1) {
+                            interactWithNPC(player, &oldMan);
+                            farmersField(player);
+                            return;
+                        } else if (choice == 2) {
+                            bridgeEncounter(player);
+                            return;
+                        } else if (choice == 3) {
+                            explorePath(player);
+                            return;
+                        } else {
+                            printf("\nInvalid choice. Please try again.\n");
+                        }
+                    }
+                }
+    if (!oldMan.quest.isActive) {
+        printf("You are standing in front of a farm.\n\n");
+        printf("An old man is trying to get your attention.\n");
+        printf("\nWhat would you like to do?\n\n");
+        printf("1. Walk over and listen to what he has to say.\n");
+        printf("2. Continue on your journey and ignore the man in need.\n");
+        printf("3. Turn back.\n");
+        printf("Your choice: ");
+        scanf("%d", &choice);
 
-            printf("\nWhat would you like to do?\n");
-            printf("1. Talk to the farmer\n");
-            printf("2. Continue towards the bridge\n");
-            printf("3. Go back to the main path\n");
-            printf("Your choice: ");
-            scanf("%d", &choice);
+        switch (choice) {
+            case 1:
+                printf("\nYou approach the old farmer.\n");
+                interactWithNPC(player, &oldMan);
+                farmersField(player);
+                return;
+                
+            case 2: // Ignore the farmer and continue
+                printf("\nYou decide to leave the farmer behind and continue on your path.\n");
+                bridgeEncounter(player);
+                return;
 
-            switch (choice) {
-                case 1:
-                    interactWithNPC(player, &oldMan);
-                    break;
+            case 3: // Return to the previous path
+                printf("\nYou decide to turn back and return to the main path.\n");
+                explorePath(player);
+                return;
 
-                case 2:
-                    printf("\nYou decide to head east towards the troll's bridge.\n");
-                    bridgeEncounter(player);
-                    return;
-
-                case 3:
-                    printf("\nYou decide to return to the main path.\n");
-                    explorePath(player);
-                    return;
-
-                default:
-                    printf("\nInvalid choice. Please try again.\n");
-            }
-            break;
-
-        default:
-            printf("\nThe state of the farm is unknown. Please report this bug!\n");
-            break;
-    }
+            default: // Invalid input
+                printf("\nInvalid choice. Please try again.\n");
+        }
 }
+              
+            if (oldMan.quest.isCompleted && oldMan.hasQuest == 1) { // Handle quest completion
+                    printf("\nThe farmer smiles warmly: \"Thank you, traveler, for retrieving the key. Here's your reward!\"\n");
+                    player->gold += oldMan.quest.rewardGold;
+                    printf("You received %d gold. Current gold: %d\n", oldMan.quest.rewardGold, player->gold);
+                    oldMan.hasQuest = 0; // No more quests from this NPC
+                    while (1) { // Loop for choices after accepting the quest
+                        printf("\nWhat would you like to do?\n");
+                        printf("1. Talk to the farmer again.\n");
+                        printf("2. Continue towards the Bridge.\n");
+                        printf("3. Go back to the pathway.\n");
+                        printf("Your choice: ");
+                        scanf("%d", &choice);
+
+                        if (choice == 1) {
+                            interactWithNPC(player, &oldMan);
+                            farmersField(player);
+                            return;
+                        } else if (choice == 2) {
+                            bridgeEncounter(player);
+                            return;
+                        } else if (choice == 3) {
+                            explorePath(player);
+                            return;
+                        } else {
+                            printf("\nInvalid choice. Please try again.\n");
+                        }
+                    }
+                }
+                }
+    
+    
+    
+
+
 
 void unlockRoom(Player *player, Room *room) {
     if (room->locked) {
@@ -1149,8 +1307,6 @@ void checkActiveQuests(Player *player, struct NPC *npc) {
     if (npc->quest.isActive) {
         printf("\nActive Quest: %s\n", npc->quest.description);
         printf("Reward: %d gold\n", npc->quest.rewardGold);
-    } else {
-        printf("No active Quests");
     }
 }
 
@@ -1192,81 +1348,7 @@ void kingdomSquare(Player *player) {
 }
 
 void graveyardSearch(Player *player) {
-    static Room graveyard = {
-        .name = "Graveyard",
-        .description = "An eerie graveyard with broken tombstones and an oppressive silence.",
-        .item = "Ancient Relic",
-        .hasItem = 1,
-        .locked = 0,
-        .isCleared = 0 // Initially not cleared
-    };
-
-    static Enemy skeletons[3] = {
-        {"Skeleton Warrior 1", 30, 1},
-        {"Skeleton Warrior 2", 30, 1},
-        {"Skeleton Warrior 3", 30, 1}
-    };
-
-    int choice;
-
-    // Check if the graveyard is cleared
-    if (!graveyard.isCleared) {
-        printf("\nYou cautiously enter the %s. %s\n", graveyard.name, graveyard.description);
-
-        printf("\nAs you explore, three Skeleton Warriors rise from the ground!\n");
-
-        // Combat loop for multiple enemies
-        for (int i = 0; i < 3; i++) {
-            if (skeletons[i].isAlive) {
-                combat(player, &skeletons[i], &graveyard);
-            }
-        }
-
-        // Check if all skeletons are defeated
-        int allDefeated = 1;
-        for (int i = 0; i < 3; i++) {
-            if (skeletons[i].isAlive) {
-                allDefeated = 0;
-                break;
-            }
-        }
-
-        if (allDefeated) {
-            graveyard.isCleared = 1;
-            printf("\nThe graveyard falls silent. All enemies have been defeated.\n");
-
-            // Allow item collection if available
-            if (graveyard.hasItem) {
-                printf("\nYou notice something glimmering on the ground: %s.\n", graveyard.item);
-                printf("Do you want to pick it up? (1: Yes, 2: No): ");
-                scanf("%d", &choice);
-
-                if (choice == 1) {
-                    pickUpItem(player, &graveyard);
-                } else {
-                    printf("\nYou leave the %s behind.\n", graveyard.item);
-                }
-            }
-        }
-    } else {
-        // Graveyard already cleared
-        printf("\nThe graveyard is eerily quiet. The Skeleton Warriors have been defeated.\n");
-
-        if (graveyard.hasItem) {
-            printf("\nYou notice something glimmering on the ground: %s.\n", graveyard.item);
-            printf("Do you want to pick it up? (1: Yes, 2: No): ");
-            scanf("%d", &choice);
-
-            if (choice == 1) {
-                pickUpItem(player, &graveyard);
-            } else {
-                printf("\nYou leave the %s behind.\n", graveyard.item);
-            }
-        }
-    }
-
-    // After combat or exploration, search the graveyard for potions
-    printf("\nYou begin searching the graveyard for anything useful.\n");
+    printf("\nYou begin searching the eerie graveyard, carefully stepping around crumbling tombstones.\n");
 
     int foundHealthPotions = 2;
     int foundHarmingPotion = 1;
@@ -1285,7 +1367,6 @@ void graveyardSearch(Player *player) {
         player->itemCount++;
     }
 
-    // Options for further exploration
     printf("\nAfter finishing your search, you look around to decide your next move.\n");
     printf("Options:\n");
     printf("1. Return to the Old Lady Bridge\n");
@@ -1293,6 +1374,7 @@ void graveyardSearch(Player *player) {
     printf("3. Approach the giant tombstone at the back of the graveyard\n");
     printf("Your choice: ");
     
+    int choice;
     scanf("%d", &choice);
 
     switch (choice) {
@@ -1314,131 +1396,63 @@ void graveyardSearch(Player *player) {
     }
 }
 
-
 void lichEncounter(Player *player) {
-    static Room lichRoom = {
-        .name = "Lich's Tomb",
-        .description = "A massive tombstone adorned with glowing runes. The air is thick with dread.",
-        .item = "Lich's Head",
-        .hasItem = 1,
-        .locked = 0,
-        .isCleared = 0 // Initially not cleared
-    };
+    Enemy lich = {"Lich", 120, 1};
+    
+    printf("\nAt the center of the graveyard, you find a massive tombstone adorned with glowing runes.\n");
+    printf("As you approach, the ground trembles, and a terrifying figure emerges—it's the Lich!\n\n");
 
-    static Enemy lich = {"Lich King", 120, 1}; // Enemy in this room
-
-    int choice;
-
-    // Check if the room is cleared
-    if (lichRoom.isCleared) {
-        printf("\nThe tomb is eerily quiet. The Lich King has been defeated.\n");
-
-        if (lichRoom.hasItem) {
-            printf("\nYou notice the Lich's Head lying on the ground.\n");
-            printf("Do you want to pick it up? (1: Yes, 2: No): ");
-            scanf("%d", &choice);
-
-            if (choice == 1) {
-                pickUpItem(player, &lichRoom);
-                printf("\nYou acquired the Lich's Head. It feels heavy with dark energy.\n");
-            } else {
-                printf("\nYou leave the Lich's Head untouched.\n");
-            }
-        }
-
-        return;
-    }
-
-    // Engage with the Lich King
-    printf("\nYou approach the %s. The %s rises from its grave, emanating a terrifying aura.\n", lichRoom.name, lich.name);
     printf("\"Foolish mortal,\" the Lich growls. \"You dare disturb my domain? Prepare to perish!\"\n");
 
-    do {
-        printf("\nWhat would you like to do?\n");
-        printf("1. Fight the Lich King\n");
-        printf("2. Attempt to flee\n");
-        printf("Your choice: ");
+    combat(player, &lich);
+
+    if (!lich.isAlive) {
+        printf("\nThe Lich lets out a final, piercing scream before collapsing into a heap of ashes.\n");
+        printf("You find the Lich's Head among the remains, its eyes still glowing faintly.\n");
+        
+        if (player->itemCount < MAX_INVENTORY_SIZE) {
+            strcpy(player->inventory[player->itemCount], "Lich's Head");
+            player->itemCount++;
+        } else {
+            printf("\nYour inventory is full! You have to leave the Lich's Head behind.\n");
+        }
+
+        printf("\nYou can now return to the Old Lady Bridge or head to the Kingdom Square.\n");
+        printf("1. Return to the Old Lady Bridge\n");
+        printf("2. Go to Kingdom Square\n");
+
+        int choice;
         scanf("%d", &choice);
 
-        switch (choice) {
-            case 1: // Fight the Lich King
-                printf("\nYou prepare to fight the Lich King!\n");
-                combat(player, &lich, &lichRoom);
-
-                if (!lich.isAlive) {
-                    printf("\nThe Lich King lets out a final, piercing scream before collapsing into a heap of ashes.\n");
-
-                    // Mark the room as cleared
-                    lichRoom.isCleared = 1;
-
-                    if (lichRoom.hasItem) {
-                        pickUpItem(player, &lichRoom);
-                        printf("\nYou found the Lich's Head among the remains. It might be important.\n");
-                    }
-                }
-                return;
-
-            case 2: // Attempt to flee
-                printf("\nYou attempt to flee from the tomb!\n");
-                int fleeNumber = rand() % 3 + 1;
-                int playerChoice;
-                printf("Pick a number (1-3): ");
-                scanf("%d", &playerChoice);
-
-                if (playerChoice == fleeNumber) {
-                    printf("\nYou escape the tomb safely, but the Lich's presence still looms.\n");
-                    return;
-                } else {
-                    printf("\nThe Lich blocks your escape with a wall of dark energy! You must fight.\n");
-                }
-                break;
-
-            default:
-                printf("\nInvalid choice. The Lich King looms over you menacingly.\n");
+        if (choice == 1) {
+            oldLadyBridge(player);
+        } else if (choice == 2) {
+            kingdomSquare(player);
+        } else {
+            printf("\nInvalid choice. You decide to stay and rest for a moment.\n");
         }
-    } while (1);
+    } else {
+        printf("\nThe Lich has defeated you. Your journey ends here. Game Over.\n");
+        exit(0);
+    }
 }
 
 
-void kingEncounter(Player *player) {
-    static Room throneRoom = {
-        .name = "Throne Room",
-        .description = "A grand chamber adorned with golden chandeliers and crimson carpets. The King's presence is overwhelming.",
-        .item = "King's Sword",
-        .hasItem = 1,
-        .locked = 0,
-        .isCleared = 0 // Initially not cleared
-    };
-
-    static Enemy theKing = {"Mighty King", 175, 1}; // Enemy in this room
-
+void kingEncounter(Player *player){ // Label for the main King encounter logic
     int choice;
 
-    // Check if the room is cleared
-    if (throneRoom.isCleared) {
-        printf("\nThe throne room is eerily quiet. The Mighty King has been defeated.\n");
-
-        if (throneRoom.hasItem) {
-            printf("\nYou notice the King's Sword glimmering on the ground.\n");
-            printf("Do you want to pick it up? (1: Yes, 2: No): ");
-            scanf("%d", &choice);
-
-            if (choice == 1) {
-                pickUpItem(player, &throneRoom);
-                printf("\nYou acquired the King's Sword! It feels incredibly powerful.\n");
-            } else {
-                printf("\nYou leave the King's Sword untouched.\n");
-            }
-        }
-
-        return;
-    }
-
-    // Engage with the King
-    printf("\nYou enter the %s. The %s glares at you with unwavering resolve.\n", throneRoom.name, theKing.name);
+    Enemy theKing = {"King", 175, 1};
+    
+    Room throneRoom = {
+        .name = "Throne Room",
+        .description = "A lavish kingdom, fit for a King.",
+        .item = "Kings Sword",
+        .hasItem = 1,
+        .locked = 0
+    };
 
     do {
-        printf("\nWhat would you like to do?\n");
+        printf("What would you like to do?\n");
         printf("1. Fight the Mighty King\n");
         printf("2. Attempt to negotiate\n");
         printf("3. Try to flee\n");
@@ -1446,139 +1460,94 @@ void kingEncounter(Player *player) {
         scanf("%d", &choice);
 
         switch (choice) {
-            case 1: // Fight the King
+            case 1:
                 printf("\nYou prepare to fight the Mighty King in his throne room!\n");
-                combat(player, &theKing, &throneRoom);
-
+                combat(player, &theKing);
                 if (!theKing.isAlive) {
-                    printf("\nThe Mighty King has fallen! The kingdom's fate is now in your hands.\n");
+                    printf("\nThe all powerful king has fallen! Quickly, take his sword!\n\n");
 
-                    // Mark the room as cleared and allow item collection
-                    throneRoom.isCleared = 1;
-
+                    // Check if the King has an item (Kings Sword) to collect
                     if (throneRoom.hasItem) {
                         pickUpItem(player, &throneRoom);
-                        printf("\nYou found the King's Sword! It looks extremely powerful...\n");
+                        printf("\nYou found the Kings Sword! It looks extremely powerful...\n\n");
+                    } else {
+                        printf("\nThe King seems to have hidden all of his treasures!n\n");
                     }
                 }
                 return;
 
-            case 2: // Negotiate with the King
+            case 2:
                 printf("\nYou try to negotiate with the King.\n");
                 if (player->gold >= 100) {
                     printf("The King considers your offer and says, \"Fine. 100 gold and I'll let you live.\"\n");
-                    printf("Do you want to pay the King? (1: Yes, 2: No): ");
+                    printf("Do you want to pay the King? (1 for Yes, 2 for No): ");
                     int payChoice;
                     scanf("%d", &payChoice);
-
                     if (payChoice == 1) {
                         player->gold -= 100;
                         printf("\nYou pay the toll and the King steps aside, allowing you to leave the castle with your life.\n");
-                        printf("Remaining gold: %d\n", player->gold);
-
-                        // Avoid fighting and mark the room as cleared
-                        throneRoom.isCleared = 1;
+                        printf("Remaining gold: %d\n\n", player->gold);
                         return;
                     } else {
                         printf("\nThe King bellows, \"Then you shall face my wrath!\"\n");
+                        combat(player, &theKing);
+                            if (!theKing.isAlive) {
+                                printf("\nThe all powerful king has fallen! Quickly, take his sword!\n\n");
+
+                                // Check if the King has an item (Kings Sword) to collect
+                                if (throneRoom.hasItem) {
+                                    pickUpItem(player, &throneRoom);
+                                    printf("\nYou found the Kings Sword! It looks extremely powerful...\n\n");
+                                } else {
+                                printf("\nThe King seems to have hidden all of his treasures!\n\n");
+                            }
+                        }
+                    return;
                     }
                 } else {
                     printf("\nThe King laughs at your empty pockets and attacks you!\n");
-                }
+                    combat(player, &theKing);
+                          if (!theKing.isAlive) {
+                          printf("\nThe all powerful king has fallen! Quickly, take his sword!\n\n");
 
-                // Fight after failed negotiation
-                combat(player, &theKing, &throneRoom);
-
-                if (!theKing.isAlive) {
-                    printf("\nThe Mighty King has fallen! Quickly, take his sword!\n");
-
-                    throneRoom.isCleared = 1;
-
-                    if (throneRoom.hasItem) {
-                        pickUpItem(player, &throneRoom);
-                        printf("\nYou found the King's Sword! It looks extremely powerful.\n");
+                            // Check if the King has an item (Kings Sword) to collect
+                            if (throneRoom.hasItem) {
+                            pickUpItem(player, &throneRoom);
+                            printf("\nYou found the Kings Sword! It looks extremely powerful...\n\n");
+                         } else {
+                            printf("\nThe King seems to have hidden all of his treasures!n\n");
+                        }
                     }
-                }
                 return;
+                }
 
-            case 3: // Attempt to flee
-                printf("\nYou attempt to flee from the throne room!\n");
-                int fleeNumber = rand() % 5 + 1;
-                int playerChoice;
+            case 3:
+                printf("\nYou attempt to flee out the throne room!\n");
                 printf("Pick a number (1-5): ");
-                scanf("%d", &playerChoice);
-
-                if (playerChoice == fleeNumber) {
-                    printf("\nYou sprint past the King and escape safely!\n");
+                int fleeNumber, correctFleeNumber;
+                scanf("%d", &fleeNumber);
+                correctFleeNumber = rand() % 5 + 1;
+                if (fleeNumber == correctFleeNumber) {
+                    printf("\nYou sprint past the King and make it out the throne room safely!\n");
                     return;
                 } else {
                     printf("\nThe King blocks your escape and yells, \"Coward! Face me!\"\n");
-                    combat(player, &theKing, &throneRoom);
-
+                    combat(player, &theKing);
                     if (!theKing.isAlive) {
-                        printf("\nThe Mighty King has fallen! Quickly, take his sword!\n");
-
-                        throneRoom.isCleared = 1;
-
+                        printf("\nThe all powerful king has fallen! Quickly, take his sword!\n\n");
+                        // Check if the King has an item (Kings Sword) to collect
                         if (throneRoom.hasItem) {
                             pickUpItem(player, &throneRoom);
-                            printf("\nYou found the King's Sword! It looks extremely powerful.\n");
+                             printf("\nYou found the Kings Sword! It looks extremely powerful...\n\n");
+                         } else {
+                            printf("\nThe King seems to have hidden all of his treasures!n\n");
                         }
                     }
+                    return;
                 }
-                return;
 
             default:
                 printf("\nInvalid choice. The King glares at you menacingly.\n");
         }
     } while (1);
 }
-
-
-void handleRoomWithEnemies(Player *player, Room *room, Enemy *enemy) {
-    if (!room || !enemy) {
-        printf("\nError: Room or Enemy data not found.\n");
-        return;
-    }
-
-    printf("\nYou enter the %s.\n", room->name);
-
-    // Switch case to handle room states
-    switch (room->isCleared) {
-        case 0: // Room not cleared
-            printf("\n%s\n", room->description);
-
-            // Engage the enemy
-            printf("\nA %s appears!\n", enemy->name);
-            combat(player, enemy, room);
-
-            // Mark the room as cleared if the enemy is defeated
-            if (!enemy->isAlive) {
-                room->isCleared = 1;
-                printf("\nThe %s is now safe.\n", room->name);
-            }
-            break;
-
-        case 1: // Room cleared
-            printf("\nThe %s is quiet. The enemies here have already been defeated.\n", room->name);
-
-            if (room->hasItem) {
-                printf("\nYou notice something on the ground: %s.\n", room->item);
-                printf("Do you want to pick it up? (1: Yes, 2: No): ");
-                int choice;
-                scanf("%d", &choice);
-
-                if (choice == 1) {
-                    pickUpItem(player, room);
-                } else {
-                    printf("\nYou leave the item untouched.\n");
-                }
-            }
-            break;
-
-        default:
-            printf("\nThe room state is unknown. Please report this bug!\n");
-            break;
-    }
-}
-
