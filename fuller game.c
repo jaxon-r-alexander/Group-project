@@ -1179,6 +1179,17 @@ void checkActiveQuests(Player *player, struct NPC *npc) {
     }
 }
 void kingEncounter(Player *player){ // Label for the main King encounter logic
+    
+    Enemy theKing = {"King", 175, 1};
+    
+    Room throneRoom = {
+        .name = "Throne Room",
+        .description = "A lavish kingdom, fit for a King.",
+        .item = "Kings Sword",
+        .hasItem = 1,
+        .locked = 0
+    };
+
     do {
         printf("What would you like to do?\n");
         printf("1. Fight the Mighty King\n");
