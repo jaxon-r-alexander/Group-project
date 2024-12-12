@@ -65,6 +65,7 @@ void townSquare(Player *player);
 void oldLadyBridge(Player *player);
 void bridgeEncounter(Player *player);
 void kingEncounter(Player *player);
+void kingdomSquare(Player *player);
 
 int main() {
     Player player;
