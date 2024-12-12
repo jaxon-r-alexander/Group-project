@@ -576,6 +576,7 @@ void bridgeEncounter(Player *player) {
                 printf("As you do, a massive figure emerges from beneath the bridge! It's a Bridge Troll!\n");
                 printf("The troll growls, \"Pay the toll or face my wrath!\"\n\n");
                 trollEncounter(player, &bridgeTroll, &bridgeRoom);
+                bridgeRoom(player);
                 return;
 
             default:
@@ -604,8 +605,35 @@ void trollEncounter(Player *player, Enemy *bridgeTroll, Room *bridgeRoom) {
 
                     // Check if the troll has an item (the key) to collect
                     if (bridgeRoom->hasItem) {
+                        printf("As you stand victourious, you see something taped around the trolls neck. What do you do?\n\n")
+                        printf("1. Inspect\n\n");
+                        printf("2. Go back to bridge entrance\n\n");
+                        printf("3. Head up the mountain\n\n");
+                        scanf("%d", &choice);
+                        if (choice == 1){
                         pickUpItem(player, bridgeRoom);
-                        printf("\nYou found the Troll's Key on its body! It might be important later.\n");
+                        printf("\nYou found the Troll's Key on its body! You can talk to the old man now!\n\n");
+                        printf("What do you do now?\n\n");
+                        printf("1. Go back to bridge entrance\n\n");
+                        printf("2. Head up the mountain\n\n");
+                        scanf("%d", &choice);
+                        if (choice == 1){
+                            bridgeEncounter(player);
+                            return;
+                        } else if (choice == 2){
+                            mountainsEncounter(player);
+                         return;
+                        } else {
+                            printf("Invalid Number, try again");
+                        }
+                        } else if (choice == 2){
+                            bridgeEncounter(player);
+                            return;
+                        } else if (choice == 3){
+                            mountainsEncounter(player);
+                         return;
+                        }
+
                     } else {
                         printf("\nThe troll seems to have nothing of value left.\n");
                     }
@@ -642,6 +670,7 @@ void trollEncounter(Player *player, Enemy *bridgeTroll, Room *bridgeRoom) {
 
                 if (fleeNumber == correctFleeNumber) {
                     printf("\nYou sprint past the troll and make it across the bridge safely!\n");
+                    mountainsEncounter(player);
                     return;
                 } else {
                     printf("\nThe troll blocks your escape and roars, \"Coward! Face me!\"\n");
