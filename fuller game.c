@@ -373,22 +373,27 @@ void riverCrossing(Player *player) {
     int choice;
 
     printf("\nYou reach a fast-flowing river.\n\n");
-    printf("1. Try to swim across.\n\n");
-    printf("2. Look for a bridge or some rocks to cross on.\n\n");
+    printf("You see a rotting tree fallen across the river.\n\n");
+    printf("What would you like to do\n");
+    printf("1. try to walk arcross the tree.\n\n");
+    printf("2. Look for a bridge or some other ways to cross.\n\n");
     printf("What do you choose? ");
     scanf("%d", &choice);
 
     if (choice == 1) {
-        printf("\nThe river is too strong! You struggle to stay afloat.\n\n");
+        printf("\nThe tree snaps, dropping you into the water and forcing you downstream.\n\n");
         player->health -= 20;
         printf("You lose 20 health. Current health: %d\n\n", player->health);
+        printf("You swim back to shore and claw your way onto dry land.\n");
+        printf("You stand up and dry yourself off.");
+        farmersField(player);
     } else if (choice == 2) {
-        printf("\nYou find a fallen tree bridging the river and carefully cross over.\n\n");
+        printf("\nYou look around but you don't see any other way to cross maybe one of the other paths has a way.\n\n");
+        explorePath(player);
     } else {
         printf("\nInvalid choice. You lose your way and wander back to the forest entrance.\n\n");
+        explorePath(player);
     }
-
-    explorePath(player);
 }
 
 void caveEncounter(Player *player) {
