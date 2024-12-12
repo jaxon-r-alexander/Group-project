@@ -1133,8 +1133,8 @@ void farmersField(Player *player) {
         printf("\nWhat would you like to do?\n\n");
         printf("1. Walk over and listen to what he has to say.\n\n");
         printf("2. Continue on your journey and ignore the man in need.\n\n");
-        printf("3. Turn back.\n\n")
-        printf("Your choice: \n\n");
+        printf("3. Turn back.\n\n");
+        printf("Your choice: ");
         scanf("%d", &choice);
 
         if (choice == 1) {
@@ -1145,9 +1145,8 @@ void farmersField(Player *player) {
             // If the player accepts the quest
             if (oldMan.quest.isActive && !oldMan.quest.isCompleted) {
                 printf("\nThe farmer says: \"The troll lives in a cave near the river to the east. Be careful, traveler!\"\n");
-                printf("You now have an active quest: %s\n", oldMan.quest.description);
-                farmersField(player);
-                return;
+                printf("You now have an active quest: %s", oldMan.quest.description);
+                return; // Exit the function after assigning the quest
             }
 
             // If the player has already completed the quest
@@ -1163,16 +1162,18 @@ void farmersField(Player *player) {
             printf("\nYou decide to leave the farmer behind and continue on your path.\n");
             bridgeEncounter(player);
             return;
-        } else if (choice == 3){
+        } else if (choice == 3) {
+            // Return to the previous path
+            printf("\nYou decide to turn back and return to the main path.\n");
             explorePath(player);
-        }
-        else {
+            return;
+        } else {
             // Invalid input
             printf("\nInvalid choice. Please try again.\n");
-            break;
         }
-    } while (choice != 1 && choice != 2);
+    } while (1); // Continue looping until a valid choice is made
 }
+
 
 void unlockRoom(Player *player, Room *room) {
     if (room->locked) {
