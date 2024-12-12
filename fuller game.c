@@ -477,7 +477,7 @@ void bridgeEncounter(Player *player) {
     Enemy bridgeTroll = {"Bridge Troll", 50, 1};
     Room bridgeRoom = {
         .name = "Bridge Crossing",
-        .description = "A narrow stone bridge guarded by a fierce troll.",
+        .description = "A pristine wooden bridge surrounded by a bright clearing.",
         .item = "Troll's Key",
         .hasItem = 1,
         .locked = 0
@@ -485,9 +485,49 @@ void bridgeEncounter(Player *player) {
 
     int choice;
 
-    printf("As you step onto the bridge, a massive figure looms ahead of you. It's a Bridge Troll!\n");
-    printf("The troll growls, \"Pay the toll or face my wrath!\".\n\n");
+    printf("\nYou step into a bright clearing as you come upon a pristine wooden bridge.\n");
+    printf("The surrounding area is serene, but the air feels heavy with a sense of foreboding.\n\n");
 
+    do {
+        printf("What would you like to do?\n");
+        printf("1. Inspect the bridge\n");
+        printf("2. Cross the bridge quietly\n");
+        printf("3. Look around the area\n");
+        printf("4. Step onto the bridge\n");
+        printf("Your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("\nYou examine the bridge closely. It appears to be well-maintained, with sturdy wooden planks and strong ropes.\n");
+                printf("However, there are faint signs of claw marks and scorch marks near the edges, hinting at danger.\n");
+                break;
+
+            case 2:
+                printf("\nYou try to cross the bridge quietly, hoping to avoid any trouble.\n");
+                printf("As you step onto the bridge, a massive figure emerges from beneath it! It's a Bridge Troll!\n");
+                printf("The troll growls, \"Pay the toll or face my wrath!\"\n\n");
+                goto TrollEncounter; // Proceed to the troll encounter
+                break;
+
+            case 3:
+                printf("\nYou look around the area and notice some bushes and trees near the bridge.\n");
+                printf("After searching for a moment, you find nothing of interest. The area seems clear.\n");
+                break;
+
+            case 4:
+                printf("\nYou step onto the bridge cautiously.\n");
+                printf("As you do, a massive figure emerges from beneath the bridge! It's a Bridge Troll!\n");
+                printf("The troll growls, \"Pay the toll or face my wrath!\"\n\n");
+                goto TrollEncounter; // Proceed to the troll encounter
+                break;
+
+            default:
+                printf("\nInvalid choice. Please choose again.\n");
+        }
+    } while (choice != 4 && choice != 2);
+
+TrollEncounter: // Label for the main troll encounter logic
     do {
         printf("What would you like to do?\n");
         printf("1. Fight the Bridge Troll\n");
@@ -589,6 +629,7 @@ void bridgeEncounter(Player *player) {
         }
     } while (1);
 }
+
 
 void mountainsEncounter(Player *player) {
     int choice;
@@ -1052,7 +1093,7 @@ void farmersField(Player *player) {
         } else if (choice == 2) {
             // Continue the journey without helping
             printf("\nYou decide to leave the farmer behind and continue on your path.\n");
-            explorePath(player);
+            bridgeEncounter(player);
             return;
         } else {
             // Invalid input
