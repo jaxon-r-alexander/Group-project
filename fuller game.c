@@ -827,19 +827,6 @@ void combat(Player *player, Enemy *enemy) {
     printf("\nA %s lunges from the shadows! It has %d health.\n\n", enemy->name, enemy->health);
     int escapeNumber, dodgeNumber, playerChoice;
 
-    int findBestWeapon(Player *player) {
-    int bestDamage = 0;
-    for (int i = 0; i < player->itemCount; i++) {
-        for (int j = 0; j < numWeapons; j++) {
-            if (strcmp(player->inventory[i], availableWeapons[j].name) == 0) {
-                if (availableWeapons[j].damage > bestDamage) {
-                    bestDamage = availableWeapons[j].damage;
-                }
-            }
-        }
-    }
-    return bestDamage > 0 ? bestDamage : availableWeapons[0].damage; // Default to "Fist" if no weapon
-}
 
 
     while (enemy->isAlive && player->health > 0) {
@@ -854,6 +841,19 @@ void combat(Player *player, Enemy *enemy) {
         switch (playerChoice) {
             case 1: // Attack
                 printf("\nYou strike at the %s!\n", enemy->name);
+                int findBestWeapon(Player *player) {
+    int bestDamage = 0;
+    for (int i = 0; i < player->itemCount; i++) {
+        for (int j = 0; j < numWeapons; j++) {
+            if (strcmp(player->inventory[i], availableWeapons[j].name) == 0) {
+                if (availableWeapons[j].damage > bestDamage) {
+                    bestDamage = availableWeapons[j].damage;
+                }
+            }
+        }
+    }
+    return bestDamage > 0 ? bestDamage : availableWeapons[0].damage; // Default to "Fist" if no weapon
+}
                 enemy->health -= bestWeaponDamage;
                 printf("The %s has %d health remaining!\n\n", enemy->name, enemy->health);
                 
