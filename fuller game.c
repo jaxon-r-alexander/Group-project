@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #define MAX_DIALOGUE_LENGTH 500
 #define MAX_NAME_LENGTH 16
