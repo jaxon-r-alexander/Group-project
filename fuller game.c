@@ -1033,25 +1033,70 @@ void interactWithNPC(Player *player, struct NPC *npc) {
 
     if (npc->hasQuest) {
         if (!npc->quest.isActive && !npc->quest.isCompleted) {
-            printf("\nWill you accept this quest? (1: Yes, 2: No): ");
+            printf("\nThis NPC has a quest for you. Will you accept it? (1: Yes, 2: No): ");
             int choice;
-            scanf("%d", &choice);
+            if (scanf("%d", &choice) != 1 || (choice != 1 && choice != 2)) {
+                printf("\nInvalid choice. Please try again.\n");
+                return;
+            }
 
             if (choice == 1) {
-                npc->quest.isActive = 1; // Activate quest
-                printf("\nQuest accepted: %s\n", npc->quest.description);
-                printf("Reward: %d gold\n", npc->quest.rewardGold);
+                // Assign quest details dynamically based on the NPC
+                if (strcmp(npc->name, "Wounded Knight") == 0) {
+                    npc->quest.isActive = 1;
+                    npc->quest.isCompleted = 0;
+                    npc->quest.rewardGold = 150;
+                    strncpy(npc->quest.targetItem, "Lich's Head", sizeof(npc->quest.targetItem));
+                    strncpy(npc->quest.description, "Defeat the Lich King and bring back his head as proof", sizeof(npc->quest.description));
+
+                    printf("\nQuest accepted: %s\n", npc->quest.description);
+                    printf("Reward: %d gold\n", npc->quest.rewardGold);
+                } else if (strcmp(npc->name, "Old Farmer") == 0) {
+                    npc->quest.isActive = 1;
+                    npc->quest.isCompleted = 0;
+                    npc->quest.rewardGold = 100;
+                    strncpy(npc->quest.targetItem, "Goblin Key", sizeof(npc->quest.targetItem));
+                    strncpy(npc->quest.description, "Retrieve the Goblin Key stolen by goblins.", sizeof(npc->quest.description));
+
+                    printf("\nQuest accepted: %s\n", npc->quest.description);
+                    printf("Reward: %d gold\n", npc->quest.rewardGold);
+                }
             }
         } else if (npc->quest.isActive && !npc->quest.isCompleted) {
-            printf("\n%s says: 'Remember, you must bring me the %s to complete the quest.'\n",
-                   npc->name, npc->quest.targetItem);
+            if (checkAndRemoveItem(player, npc->quest.targetItem)) {
+                printf("\nYou present the %s to %s.\n", npc->quest.targetItem, npc->name);
+                printf("'Thank you! You've helped me greatly.'\n");
+
+                player->gold += npc->quest.rewardGold;
+                printf("\nReceived %d gold!\n", npc->quest.rewardGold);
+                printf("Current gold: %d\n", player->gold);
+
+                npc->quest.isCompleted = 1;
+                npc->quest.isActive = 0;
+                strncpy(npc->dialogue, "Thank you for completing the quest!", sizeof(npc->dialogue));
+            } else {
+                printf("\n'Remember, bring me the %s as proof of your success.'\n", npc->quest.targetItem);
+            }
         } else if (npc->quest.isCompleted) {
-            printf("\n%s nods at you with respect: 'Thank you for completing the quest.'\n", npc->name);
+            printf("\n%s nods at you with respect.\n", npc->name);
         }
-    } else {
-        printf("\n%s has no quest for you.\n", npc->name);
     }
 }
+
+int checkAndRemoveItem(Player *player, const char *item) {
+    for (int i = 0; i < player->itemCount; i++) {
+        if (strcmp(player->inventory[i], item) == 0) {
+            // Remove item by shifting the rest
+            for (int j = i; j < player->itemCount - 1; j++) {
+                strncpy(player->inventory[j], player->inventory[j + 1], sizeof(player->inventory[j]));
+            }
+            player->itemCount--;
+            return 1; // Item found and removed
+        }
+    }
+    return 0; // Item not found
+}
+
 
 void farmersField(Player *player) {
     int choice;
