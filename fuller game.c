@@ -1088,7 +1088,6 @@ player->inventory[player->itemCount - 1][0] = '\0'; // Clear the last item
     return 0; // Item not found
 }
 
-
 void farmersField(Player *player) {
     int choice;
 
@@ -1109,49 +1108,68 @@ void farmersField(Player *player) {
     printf("You are standing in front of a farm.\n\n");
     printf("An old man is trying to get your attention.\n");
 
-    do {
+    while (1) { // Main loop for the farmer's field interaction
         printf("\nWhat would you like to do?\n\n");
-        printf("1. Walk over and listen to what he has to say.\n\n");
-        printf("2. Continue on your journey and ignore the man in need.\n\n");
-        printf("3. Turn back.\n\n");
+        printf("1. Walk over and listen to what he has to say.\n");
+        printf("2. Continue on your journey and ignore the man in need.\n");
+        printf("3. Turn back.\n");
         printf("Your choice: ");
         scanf("%d", &choice);
 
-        if (choice == 1) {
-            // Interact with the old man
-            printf("\nYou approach the old farmer.\n");
-            interactWithNPC(player, &oldMan);
+        switch (choice) {
+            case 1: // Talk to the farmer
+                printf("\nYou approach the old farmer.\n");
+                interactWithNPC(player, &oldMan);
 
-            // If the player accepts the quest
-            if (oldMan.quest.isActive && !oldMan.quest.isCompleted) {
-                printf("\nThe farmer says: \"The troll lives in a cave near the river to the east. Be careful, traveler!\"\n");
-                printf("You now have an active quest: %s", oldMan.quest.description);
-                return; // Exit the function after assigning the quest
-            }
+                if (oldMan.quest.isActive && !oldMan.quest.isCompleted) {
+                    printf("\nThe farmer says: \"The troll lives under the bridge on the river to the east. Be careful, traveler!\"\n");
+                    printf("You now have an active quest: %s\n", oldMan.quest.description);
 
-            // If the player has already completed the quest
-            if (oldMan.quest.isCompleted) {
-                printf("\nThe farmer smiles warmly: \"Thank you, traveler, for retrieving the key. Here's your reward!\"\n");
-                player->gold += oldMan.quest.rewardGold;
-                printf("You received %d gold. Current gold: %d\n", oldMan.quest.rewardGold, player->gold);
-                oldMan.hasQuest = 0;  // No more quests from this NPC
+                    while (1) { // Loop for choices after accepting the quest
+                        printf("\nWhat would you like to do?\n");
+                        printf("1. Talk to the farmer again.\n");
+                        printf("2. Continue towards the Troll.\n");
+                        printf("3. Go back to the pathway.\n");
+                        printf("Your choice: ");
+                        scanf("%d", &choice);
+
+                        if (choice == 1) {
+                            interactWithNPC(player, &oldMan);
+                        } else if (choice == 2) {
+                            bridgeEncounter(player);
+                            return;
+                        } else if (choice == 3) {
+                            explorePath(player);
+                            return;
+                        } else {
+                            printf("\nInvalid choice. Please try again.\n");
+                        }
+                    }
+                }
+
+                if (oldMan.quest.isCompleted) { // Handle quest completion
+                    printf("\nThe farmer smiles warmly: \"Thank you, traveler, for retrieving the key. Here's your reward!\"\n");
+                    player->gold += oldMan.quest.rewardGold;
+                    printf("You received %d gold. Current gold: %d\n", oldMan.quest.rewardGold, player->gold);
+                    oldMan.hasQuest = 0; // No more quests from this NPC
+                    return;
+                }
+                break;
+
+            case 2: // Ignore the farmer and continue
+                printf("\nYou decide to leave the farmer behind and continue on your path.\n");
+                bridgeEncounter(player);
                 return;
-            }
-        } else if (choice == 2) {
-            // Continue the journey without helping
-            printf("\nYou decide to leave the farmer behind and continue on your path.\n");
-            bridgeEncounter(player);
-            return;
-        } else if (choice == 3) {
-            // Return to the previous path
-            printf("\nYou decide to turn back and return to the main path.\n");
-            explorePath(player);
-            return;
-        } else {
-            // Invalid input
-            printf("\nInvalid choice. Please try again.\n");
+
+            case 3: // Return to the previous path
+                printf("\nYou decide to turn back and return to the main path.\n");
+                explorePath(player);
+                return;
+
+            default: // Invalid input
+                printf("\nInvalid choice. Please try again.\n");
         }
-    } while (1); // Continue looping until a valid choice is made
+    }
 }
 
 
