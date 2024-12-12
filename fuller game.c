@@ -86,6 +86,8 @@ int findBestWeapon(Player *player);
 int main() {
     Player player;
     intro(&player);
+    srand(time(NULL));
+
     
     int choice;
 
