@@ -81,6 +81,7 @@ void kingEncounter(Player *player);
 void kingdomSquare(Player *player);
 void lichEncounter(Player *player);
 void graveyardSearch(Player *player);
+int findBestWeapon(Player *player);
 
 int main() {
     Player player;
@@ -631,6 +632,20 @@ void bridgeEncounter(Player *player) {
     }
 }
 
+int findBestWeapon(Player *player) {
+    int bestDamage = 0;
+    for (int i = 0; i < player->itemCount; i++) {
+        for (int j = 0; j < numWeapons; j++) {
+            if (strcmp(player->inventory[i], availableWeapons[j].name) == 0) {
+                if (availableWeapons[j].damage > bestDamage) {
+                    bestDamage = availableWeapons[j].damage;
+                }
+            }
+        }
+    }
+    return bestDamage > 0 ? bestDamage : availableWeapons[0].damage; // Default to "Fist" if no weapon
+}
+
 
 void mountainsEncounter(Player *player) {
     int choice;
@@ -841,26 +856,15 @@ void combat(Player *player, Enemy *enemy) {
                     switch (playerChoice) {
                         case 1: // Attack
                             printf("\nYou strike at the %s!\n", enemy->name);
-                            int findBestWeapon(Player *player) {
-                            int bestDamage = 0;
-                            for (int i = 0; i < player->itemCount; i++) {
-                            for (int j = 0; j < numWeapons; j++) {
-                            if (strcmp(player->inventory[i], availableWeapons[j].name) == 0) {
-                            if (availableWeapons[j].damage > bestDamage) {
-                                bestDamage = availableWeapons[j].damage;
-                            }
-                        }
-                    }
-                }
-                return bestDamage > 0 ? bestDamage : availableWeapons[0].damage; // Default to "Fist" if no weapon
-            }
-
-                enemy->health -= bestWeaponDamage;
-                printf("The %s has %d health remaining!\n\n", enemy->name, enemy->health);
+                                findBestWeapon(player);
+                                    int bestWeaponDamage = findBestWeapon(player);
+                                enemy->health -= bestWeaponDamage;
+                            printf("The %s has %d health remaining!\n\n", enemy->name, enemy->health);
+                        break;
                 
                 if (enemy->health <= 0) {
                     printf("You have slain the %s!\n\n", enemy->name);
-                    enemy->isAlive = 0;
+                        enemy->isAlive = 0;
                     return;
                 }
                 break;
