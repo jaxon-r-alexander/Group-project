@@ -784,12 +784,12 @@ void oldLadyBridge(Player *player) {
             case 1:
                 printf("\nYou approach the old lady.\n");
                 interactWithNPC(player, &oldLady);
-                printf("She smiles faintly and adds, \"Good luck, brave traveler.\"\n\n");
+                printf("She smiles faintly and adds, \"Good luck, %s.\"\n\n", player->name);
                 break;
 
             case 2:
                 printf("\nYou decide to cross the bridge silently, nodding politely to the old lady as you pass.\n");
-                printf("Her voice follows you: \"Remember, not all battles are won by strength alone.\"\n");
+                printf("Her voice follows you: \"Remember, %s ,not all battles are won by strength alone.\"\n", player->name);
                 printf("\nYou make it across the bridge safely.\n\n");
                 graveyardEncounter(player);
                 return;
