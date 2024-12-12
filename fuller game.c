@@ -1055,14 +1055,14 @@ void printInventory(Player *player) {
 
 void pickUpItem(Player *player, Room *room) {
     if (room->hasItem) {
-        if (player->itemCount < MAX_INVENTORY_SIZE) {  // Use MAX_INVENTORY_SIZE instead of MAX_INVENTORY
+        if (player->itemCount < MAX_INVENTORY_SIZE) {
             strcpy(player->inventory[player->itemCount], room->item);
             player->itemCount++;
-            printf("\nYou picked up %s\n", room->item);
+            printf("\nYou picked up %s.\n", room->item);
             room->hasItem = 0;
-            room->item[0] = '\0';  // Clear the item
+            room->item[0] = '\0'; // Clear the item
         } else {
-            printf("\nYour inventory is full!\n");
+            printf("\nYour inventory is full! You cannot pick up %s.\n", room->item);
         }
     } else {
         printf("\nThere is nothing to pick up here.\n");
@@ -1070,72 +1070,65 @@ void pickUpItem(Player *player, Room *room) {
 }
 
 void interactWithNPC(Player *player, struct NPC *npc) {
-    // Function to check and remove the required item from the player's inventory
-    int checkAndRemoveItem(Player *player, const char *item);
-
     printf("\n%s says: %s\n", npc->name, npc->dialogue);
 
     if (npc->hasQuest) {
-        if (!npc->quest.isActive && !npc->quest.isCompleted) {
-            // NPC offers a quest
+        if (npc->quest.isActive && !npc->quest.isCompleted) {
+            // Check if the player has the required item
+            if (checkAndRemoveItem(player, npc->quest.targetItem)) {
+                // Complete the quest
+                printf("\nYou present the %s to %s.\n", npc->quest.targetItem, npc->name);
+                printf("%s smiles and says, 'Thank you! You've helped me greatly.'\n", npc->name);
+
+                player->gold += npc->quest.rewardGold; // Reward the player
+                printf("\nYou received %d gold! Current gold: %d\n", npc->quest.rewardGold, player->gold);
+
+                npc->quest.isCompleted = 1; // Mark quest as completed
+                npc->quest.isActive = 0;   // Deactivate quest
+                strncpy(npc->dialogue, "Thank you for completing the quest!", sizeof(npc->dialogue));
+            } else {
+                // Player does not have the item
+                printf("\n'%s says: \"Remember, bring me the %s as proof of your success.\"\n", npc->name, npc->quest.targetItem);
+            }
+        } else if (!npc->quest.isActive && !npc->quest.isCompleted) {
+            // Offer the quest if not active and not completed
             printf("\nThis NPC has a quest for you: %s\n", npc->quest.description);
             printf("Reward: %d gold\n", npc->quest.rewardGold);
             printf("Will you accept the quest? (1: Yes, 2: No): ");
             int choice;
-            if (scanf("%d", &choice) != 1 || (choice != 1 && choice != 2)) {
-                printf("\nInvalid choice. Please try again.\n");
-                return;
-            }
+            scanf("%d", &choice);
 
             if (choice == 1) {
                 npc->quest.isActive = 1;
-                npc->quest.isCompleted = 0;
                 printf("\nQuest accepted: %s\n", npc->quest.description);
             } else {
                 printf("\nYou declined the quest.\n");
             }
-        } else if (npc->quest.isActive && !npc->quest.isCompleted) {
-            // NPC reminds the player about the active quest
-            printf("\n'%s says: \"Remember, bring me the %s as proof of your success.\"\n", npc->name, npc->quest.targetItem);
-
-            // Check if the player has the required quest item
-            if (checkAndRemoveItem(player, npc->quest.targetItem)) {
-                printf("\nYou present the %s to %s.\n", npc->quest.targetItem, npc->name);
-                printf("%s smiles and says, 'Thank you! You've helped me greatly.'\n", npc->name);
-
-                // Reward the player and complete the quest
-                player->gold += npc->quest.rewardGold;
-                printf("\nYou received %d gold! Current gold: %d\n", npc->quest.rewardGold, player->gold);
-
-                npc->quest.isCompleted = 1;
-                npc->quest.isActive = 0;
-                strncpy(npc->dialogue, "Thank you for completing the quest!", sizeof(npc->dialogue));
-            }
         } else if (npc->quest.isCompleted) {
-            // NPC acknowledges the completed quest
-            printf("\n%s nods at you with respect and says, 'Thank you for your help.'\n", npc->name);
+            // Quest already completed
+            printf("\n%s nods at you with respect and says, 'Thank you again for your help.'\n", npc->name);
         }
     } else {
-        // NPC has no quest
         printf("\n%s has nothing more to ask of you.\n", npc->name);
     }
 }
 
-
 int checkAndRemoveItem(Player *player, const char *item) {
     for (int i = 0; i < player->itemCount; i++) {
         if (strcmp(player->inventory[i], item) == 0) {
-            // Remove item by shifting the rest
+            // Shift remaining items to remove the found item
             for (int j = i; j < player->itemCount - 1; j++) {
-    strncpy(player->inventory[j], player->inventory[j + 1], sizeof(player->inventory[j]));
-}
-player->inventory[player->itemCount - 1][0] = '\0'; // Clear the last item
-
+                strcpy(player->inventory[j], player->inventory[j + 1]);
+            }
+            player->itemCount--; // Reduce item count
+            printf("\nYou handed over the %s.\n", item);
             return 1; // Item found and removed
         }
     }
+    printf("\nYou don't have the required item: %s\n", item);
     return 0; // Item not found
 }
+
 
 void farmersField(Player *player) {
     int choice;
