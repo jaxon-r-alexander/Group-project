@@ -1166,9 +1166,10 @@ void farmersField(Player *player) {
         } else if (choice == 3){
             explorePath(player);
         }
-        }else {
+        else {
             // Invalid input
             printf("\nInvalid choice. Please try again.\n");
+            break;
         }
     } while (choice != 1 && choice != 2);
 }
