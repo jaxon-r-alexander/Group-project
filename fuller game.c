@@ -121,6 +121,8 @@ void Tavern(Player *player) {
 
     if (choice == 1) {
         printf("\nThe people around you are too drunk to talk coherently. You're not getting anywhere.\n\n");
+        printf("\nYou decide to start your adventure.\n\n");
+        townSquare(player);
     } else if (choice == 2) {
         printf("\nYou decide to start your adventure.\n\n");
         townSquare(player);
