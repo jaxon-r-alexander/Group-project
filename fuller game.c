@@ -1115,7 +1115,7 @@ void farmersField(Player *player) {
     // Initialize the old man as an NPC with a quest
     struct NPC oldMan = {
         .name = "Old Farmer",
-        .dialogue = "Hello traveler! I need your help. A troll has stolen a key I was entrusted with by a knight. Please, retrieve it for me!",
+        .dialogue = "Hello traveler! I need your help. A troll has stolen a key I was entrusted with by a knight. Please, retrieve it for me!\n\n",
         .hasQuest = 1,
         .quest = {
             .isActive = 0,
@@ -1124,16 +1124,17 @@ void farmersField(Player *player) {
         }
     };
     strcpy(oldMan.quest.targetItem, "Troll's Key");
-    strcpy(oldMan.quest.description, "Retrieve the key stolen by the troll and return it to the old farmer.");
+    strcpy(oldMan.quest.description, "Retrieve the key stolen by the troll and return it to the old farmer.\n\n");
 
-    printf("\nYou are standing in front of a farm.\n");
+    printf("You are standing in front of a farm.\n\n");
     printf("An old man is trying to get your attention.\n");
 
     do {
-        printf("\nWhat would you like to do?\n");
-        printf("1. Walk over and listen to what he has to say.\n");
-        printf("2. Continue on your journey and ignore the man in need.\n");
-        printf("Your choice: ");
+        printf("\nWhat would you like to do?\n\n");
+        printf("1. Walk over and listen to what he has to say.\n\n");
+        printf("2. Continue on your journey and ignore the man in need.\n\n");
+        printf("3. Turn back.\n\n")
+        printf("Your choice: \n\n");
         scanf("%d", &choice);
 
         if (choice == 1) {
@@ -1162,7 +1163,10 @@ void farmersField(Player *player) {
             printf("\nYou decide to leave the farmer behind and continue on your path.\n");
             bridgeEncounter(player);
             return;
-        } else {
+        } else if (choice == 3){
+            explorePath(player);
+        }
+        }else {
             // Invalid input
             printf("\nInvalid choice. Please try again.\n");
         }
