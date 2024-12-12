@@ -826,6 +826,7 @@ void combat(Player *player, Enemy *enemy) {
     
     printf("\nA %s lunges from the shadows! It has %d health.\n\n", enemy->name, enemy->health);
     int escapeNumber, dodgeNumber, playerChoice;
+
     int findBestWeapon(Player *player) {
     int bestDamage = 0;
     for (int i = 0; i < player->itemCount; i++) {
@@ -853,8 +854,7 @@ void combat(Player *player, Enemy *enemy) {
         switch (playerChoice) {
             case 1: // Attack
                 printf("\nYou strike at the %s!\n", enemy->name);
-                if
-                enemy->health -= 20;
+                enemy->health -= bestWeaponDamage;
                 printf("The %s has %d health remaining!\n\n", enemy->name, enemy->health);
                 
                 if (enemy->health <= 0) {
@@ -1352,7 +1352,7 @@ void kingEncounter(Player *player){ // Label for the main King encounter logic
                                     pickUpItem(player, &throneRoom);
                                     printf("\nYou found the Kings Sword! It looks extremely powerful...\n\n");
                                 } else {
-                                printf("\nThe King seems to have hidden all of his treasures!n\n");
+                                printf("\nThe King seems to have hidden all of his treasures!\n\n");
                             }
                         }
                     return;
