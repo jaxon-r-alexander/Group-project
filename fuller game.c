@@ -465,6 +465,7 @@ void caveEncounter(Player *player) {
                             if (deeperChoice == 1) {
                                 printf("The cave slowly gets smaller till you find a wall, you must go back.\n\n"); 
                                 caveEncounter(player);
+                            }
                                 return;
                                 else(
                                     printf("You exit the cave\n\n");
