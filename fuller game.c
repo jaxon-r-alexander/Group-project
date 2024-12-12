@@ -46,6 +46,19 @@ struct NPC {
     struct Quest quest;
 };
 
+typedef struct {
+    char name[MAX_NAME_LENGTH];
+    int damage;
+} Weapon;
+
+Weapon availableWeapons[] = {
+    {"Fist", 15},
+    {"Short Sword", 30},
+    {"Long Sword", 40},
+    {"Legendary Sword", 50}
+};
+const int numWeapons = sizeof(availableWeapons) / sizeof(Weapon);
+
 
 
 void intro(Player *player);
@@ -220,6 +233,7 @@ void shop(Player *player) {
                     strcpy(player->inventory[player->itemCount], "Short Sword");
                     player->itemCount++;
                     printf("\nYou bought a Short Sword! You feel stronger. Remaining gold: %d\n\n", player->gold);
+
                 } else {
                     printf("\nYou don't have enough gold for the Short Sword.\n\n");
                 }
@@ -812,6 +826,20 @@ void combat(Player *player, Enemy *enemy) {
     
     printf("\nA %s lunges from the shadows! It has %d health.\n\n", enemy->name, enemy->health);
     int escapeNumber, dodgeNumber, playerChoice;
+    int findBestWeapon(Player *player) {
+    int bestDamage = 0;
+    for (int i = 0; i < player->itemCount; i++) {
+        for (int j = 0; j < numWeapons; j++) {
+            if (strcmp(player->inventory[i], availableWeapons[j].name) == 0) {
+                if (availableWeapons[j].damage > bestDamage) {
+                    bestDamage = availableWeapons[j].damage;
+                }
+            }
+        }
+    }
+    return bestDamage > 0 ? bestDamage : availableWeapons[0].damage; // Default to "Fist" if no weapon
+}
+
 
     while (enemy->isAlive && player->health > 0) {
         printf("\nCombat Options:\n");
@@ -825,6 +853,7 @@ void combat(Player *player, Enemy *enemy) {
         switch (playerChoice) {
             case 1: // Attack
                 printf("\nYou strike at the %s!\n", enemy->name);
+                if
                 enemy->health -= 20;
                 printf("The %s has %d health remaining!\n\n", enemy->name, enemy->health);
                 
