@@ -467,10 +467,11 @@ void caveEncounter(Player *player) {
                                 caveEncounter(player);
                             }
                                 return;
-                                else(
+                                else({
                                     printf("You exit the cave\n\n");
                                     caveEncounter(player);
                                     return;
+                                }
                                 )
                             }
                         }
