@@ -1175,3 +1175,104 @@ void checkActiveQuests(Player *player, struct NPC *npc) {
         printf("Reward: %d gold\n", npc->quest.rewardGold);
     }
 }
+KingEncounter: // Label for the main King encounter logic
+    do {
+        printf("What would you like to do?\n");
+        printf("1. Fight the Mighty King\n");
+        printf("2. Attempt to negotiate\n");
+        printf("3. Try to flee\n");
+        printf("Your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("\nYou prepare to fight the Mighty King in his throne room!\n");
+                combat(player, &theKing);
+                if (!theKing.isAlive) {
+                    printf("\nThe all powerful king has fallen! Quickly, take his sword!\n\n");
+
+                    // Check if the King has an item (Kings Sword) to collect
+                    if (throneRoom.hasItem) {
+                        pickUpItem(player, &throneRoom);
+                        printf("\nYou found the Kings Sword! It looks extremely powerful...\n\n");
+                    } else {
+                        printf("\nThe King seems to have hidden all of his treasures!n\n");
+                    }
+                }
+                return;
+
+            case 2:
+                printf("\nYou try to negotiate with the King.\n");
+                if (player->gold >= 100) {
+                    printf("The King considers your offer and says, \"Fine. 100 gold and I'll let you live.\"\n");
+                    printf("Do you want to pay the King? (1 for Yes, 2 for No): ");
+                    int payChoice;
+                    scanf("%d", &payChoice);
+                    if (payChoice == 1) {
+                        player->gold -= 100;
+                        printf("\nYou pay the toll and the King steps aside, allowing you to leave the castle with your life.\n");
+                        printf("Remaining gold: %d\n\n", player->gold);
+                        return;
+                    } else {
+                        printf("\nThe King bellows, \"Then you shall face my wrath!\"\n");
+                        combat(player, &theKing);
+                            if (!theKing.isAlive) {
+                                printf("\nThe all powerful king has fallen! Quickly, take his sword!\n\n");
+
+                                // Check if the King has an item (Kings Sword) to collect
+                                if (throneRoom.hasItem) {
+                                    pickUpItem(player, &throneRoom);
+                                    printf("\nYou found the Kings Sword! It looks extremely powerful...\n\n");
+                                } else {
+                                printf("\nThe King seems to have hidden all of his treasures!n\n");
+                            }
+                        }
+                    return;
+                    }
+                } else {
+                    printf("\nThe King laughs at your empty pockets and attacks you!\n");
+                    combat(player, &theKing);
+                          if (!theKing.isAlive) {
+                          printf("\nThe all powerful king has fallen! Quickly, take his sword!\n\n");
+
+                            // Check if the King has an item (Kings Sword) to collect
+                            if (throneRoom.hasItem) {
+                            pickUpItem(player, &throneRoom);
+                            printf("\nYou found the Kings Sword! It looks extremely powerful...\n\n");
+                         } else {
+                            printf("\nThe King seems to have hidden all of his treasures!n\n");
+                        }
+                    }
+                return;
+                }
+
+            case 3:
+                printf("\nYou attempt to flee out the throne room!\n");
+                printf("Pick a number (1-5): ");
+                int fleeNumber, correctFleeNumber;
+                scanf("%d", &fleeNumber);
+                correctFleeNumber = rand() % 5 + 1;
+                if (fleeNumber == correctFleeNumber) {
+                    printf("\nYou sprint past the King and make it out the throne room safely!\n");
+                    return;
+                } else {
+                    printf("\nThe King blocks your escape and yells, \"Coward! Face me!\"\n");
+                    combat(player, &theKing);
+                    if (!theKing.isAlive) {
+                        printf("\nThe all powerful king has fallen! Quickly, take his sword!\n\n");
+                        // Check if the King has an item (Kings Sword) to collect
+                        if (throneRoom.hasItem) {
+                            pickUpItem(player, &throneRoom);
+                             printf("\nYou found the Kings Sword! It looks extremely powerful...\n\n");
+                         } else {
+                            printf("\nThe King seems to have hidden all of his treasures!n\n");
+                        }
+                    }
+                    return;
+                }
+
+            default:
+                printf("\nInvalid choice. The King glares at you menacingly.\n");
+        }
+    } while (1);
+}
