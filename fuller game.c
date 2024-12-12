@@ -61,6 +61,7 @@ void unlockRoom(Player *player, Room *room);
 void shop(Player *player);
 void interactWithNPC(Player *player, struct NPC *npc);
 void townSquare(Player *player);
+void oldLadyBridge(Player *player);
 
 int main() {
     Player player;
@@ -342,7 +343,7 @@ void caveEncounter(Player *player) {
                             scanf("%d", &deeperChoice);
                             
                             if (deeperChoice == 1) {
-                                bridgeEncounter(player);
+                                oldLadyBridge(player);
                                 return;
                             }
                         }
