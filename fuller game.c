@@ -189,6 +189,7 @@ void shop(Player *player) {
     printf("Gold: %d\n\n", player->gold);
 
     while (1) {
+        printf("\nGold: %d\n", player->gold);
         printf("What would you like to buy? ");
         scanf("%d", &itemChoice);
 
@@ -248,7 +249,8 @@ void shop(Player *player) {
                 return;
             default:
                 printf("\nInvalid choice. Please choose a valid item.\n\n");
-        }
+        
+      }
     }
 }
 
