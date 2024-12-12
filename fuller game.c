@@ -388,7 +388,8 @@ void riverCrossing(Player *player) {
         printf("You stand up and dry yourself off.\n\n");
         farmersField(player);
     } else if (choice == 2) {
-        printf("\nYou look around but you don't see any other way to cross maybe one of the other paths has a way.\n\n");
+        printf("\nYou look around but you don't see any other way to cross maybe one of the other paths has a way.\n");
+        printf("You turn around back to the main path.\n");
         explorePath(player);
     } else {
         printf("\nInvalid choice. You lose your way and wander back to the forest entrance.\n\n");
