@@ -345,9 +345,12 @@ void graveyardEncounter(Player *player) {
         }
     }
 
+    if (!skeletons[0].isAlive && !skeletons[1].isAlive && !skeletons[2].isAlive) {
     printf("\nYou have defeated all the skeletons!\n");
-    printf("The graveyard grows silent, but you can feel the dark presence of the Lich deeper within...\n\n");
-    // Next step: Lich encounter or exploration of the graveyard
+    printf("The graveyard grows silent, but you feel an ominous presence deeper within...\n\n");
+    graveyardSearch(player);
+
+}
 }
 
 void explorePath(Player *player) {
@@ -1221,6 +1224,95 @@ void kingdomSquare(Player *player) {
     } while (1);
 }
 
+void graveyardSearch(Player *player) {
+    printf("\nYou begin searching the eerie graveyard, carefully stepping around crumbling tombstones.\n");
+
+    int foundHealthPotions = 2;
+    int foundHarmingPotion = 1;
+
+    if (foundHealthPotions > 0) {
+        printf("You find %d Health Potions among the ruins.\n", foundHealthPotions);
+        for (int i = 0; i < foundHealthPotions && player->itemCount < MAX_INVENTORY_SIZE; i++) {
+            strcpy(player->inventory[player->itemCount], "Health Potion");
+            player->itemCount++;
+        }
+    }
+
+    if (foundHarmingPotion > 0 && player->itemCount < MAX_INVENTORY_SIZE) {
+        printf("You find a Potion of Harming among the ruins.\n");
+        strcpy(player->inventory[player->itemCount], "Potion of Harming");
+        player->itemCount++;
+    }
+
+    printf("\nAfter finishing your search, you look around to decide your next move.\n");
+    printf("Options:\n");
+    printf("1. Return to the Old Lady Bridge\n");
+    printf("2. Head to Kingdom Square\n");
+    printf("3. Approach the giant tombstone at the back of the graveyard\n");
+    printf("Your choice: ");
+    
+    int choice;
+    scanf("%d", &choice);
+
+    switch (choice) {
+        case 1:
+            printf("\nYou make your way back to the Old Lady Bridge.\n");
+            oldLadyBridge(player);
+            break;
+        case 2:
+            printf("\nYou head towards the Kingdom Square.\n");
+            kingdomSquare(player);
+            break;
+        case 3:
+            printf("\nYou cautiously approach the giant tombstone at the back of the graveyard.\n");
+            lichEncounter(player);
+            break;
+        default:
+            printf("\nInvalid choice. You stand still, unsure where to go.\n");
+            graveyardSearch(player);
+    }
+}
+
+void lichEncounter(Player *player) {
+    Enemy lich = {"Lich", 120, 1};
+    
+    printf("\nAt the center of the graveyard, you find a massive tombstone adorned with glowing runes.\n");
+    printf("As you approach, the ground trembles, and a terrifying figure emerges—it's the Lich!\n\n");
+
+    printf("\"Foolish mortal,\" the Lich growls. \"You dare disturb my domain? Prepare to perish!\"\n");
+
+    combat(player, &lich);
+
+    if (!lich.isAlive) {
+        printf("\nThe Lich lets out a final, piercing scream before collapsing into a heap of ashes.\n");
+        printf("You find the Lich's Head among the remains, its eyes still glowing faintly.\n");
+        
+        if (player->itemCount < MAX_INVENTORY_SIZE) {
+            strcpy(player->inventory[player->itemCount], "Lich's Head");
+            player->itemCount++;
+        } else {
+            printf("\nYour inventory is full! You have to leave the Lich's Head behind.\n");
+        }
+
+        printf("\nYou can now return to the Old Lady Bridge or head to the Kingdom Square.\n");
+        printf("1. Return to the Old Lady Bridge\n");
+        printf("2. Go to Kingdom Square\n");
+
+        int choice;
+        scanf("%d", &choice);
+
+        if (choice == 1) {
+            oldLadyBridge(player);
+        } else if (choice == 2) {
+            kingdomSquare(player);
+        } else {
+            printf("\nInvalid choice. You decide to stay and rest for a moment.\n");
+        }
+    } else {
+        printf("\nThe Lich has defeated you. Your journey ends here. Game Over.\n");
+        exit(0);
+    }
+}
 
 void kingEncounter(Player *player){ // Label for the main King encounter logic
     int choice;
@@ -1335,3 +1427,4 @@ void kingEncounter(Player *player){ // Label for the main King encounter logic
         }
     } while (1);
 }
+
