@@ -421,7 +421,8 @@ void caveEncounter(Player *player) {
         printf("1. Examine the cave entrance\n");
         printf("2. Speak with the wounded knight\n");
         printf("3. Open inventory\n");
-        printf("4. Return to the previous path\n\n");
+        printf("4. Continue on east towards the river\n\n");
+        printf("5. Return to the previous path\n\n");
         printf("Your choice: ");
         scanf("%d", &choice);
 
@@ -440,21 +441,36 @@ void caveEncounter(Player *player) {
                             printf("\nYou step into the darkness...\n\n");
                             combat(player, &goblin);
                             if (cave.hasItem) {
-                                pickUpItem(player, &cave);
+                                printf("You see something sparkaling on the ground, do you want to inspect it?(1 for Yes, 2 for No)\n\n");
+                                scanf("%d, choice");
+                                switch (choice){
+                                    case 1:
+                                    pickUpItem(player, &cave);
+                                    break;
+                                    case 2:
+                                    break;
+                                }
+                                
                             }
                             
                             // After defeating the goblin and potentially getting the item
                             printf("\nDeeper in the cave, you find yourself in a dimly lit chamber.\n");
                             printf("What would you like to do?\n\n");
-                            printf("1. Continue forward towards the bridge\n");
+                            printf("1. Continue deeper into the cave\n");
                             printf("2. Return to the cave entrance\n\n");
                             
                             int deeperChoice;
                             scanf("%d", &deeperChoice);
                             
                             if (deeperChoice == 1) {
-                                oldLadyBridge(player);
+                                printf("The cave slowly gets smaller till you find a wall, you must go back.\n\n"); 
+                                caveEncounter(player);
                                 return;
+                                else(
+                                    printf("You exit the cave\n\n");
+                                    caveEncounter(player);
+                                    return;
+                                )
                             }
                         }
                     }
@@ -472,6 +488,10 @@ void caveEncounter(Player *player) {
                 break;
 
             case 4:
+            oldLadyBridge(player);
+            return;
+                
+            case 5:
                 printf("\nYou decide to return to the forest path.\n\n");
                 explorePath(player);
                 return;
