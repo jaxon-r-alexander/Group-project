@@ -373,7 +373,7 @@ void riverCrossing(Player *player) {
     int choice;
 
     printf("\nYou reach a fast-flowing river.\n\n");
-    printf("You see a rotting tree fallen across the river.\n\n");
+    printf("You see a rotted tree fallen across the river.\n\n");
     printf("What would you like to do.\n\n");
     printf("1. try to walk arcross the tree.\n\n");
     printf("2. Look for a bridge or some other ways to cross.\n\n");
