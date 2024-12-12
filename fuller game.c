@@ -374,7 +374,7 @@ void riverCrossing(Player *player) {
 
     printf("\nYou reach a fast-flowing river.\n\n");
     printf("You see a rotting tree fallen across the river.\n\n");
-    printf("What would you like to do\n");
+    printf("What would you like to do.\n\n");
     printf("1. try to walk arcross the tree.\n\n");
     printf("2. Look for a bridge or some other ways to cross.\n\n");
     printf("What do you choose? ");
@@ -384,8 +384,8 @@ void riverCrossing(Player *player) {
         printf("\nThe tree snaps, dropping you into the water and forcing you downstream.\n\n");
         player->health -= 20;
         printf("You lose 20 health. Current health: %d\n\n", player->health);
-        printf("You swim back to shore and claw your way onto dry land.\n");
-        printf("You stand up and dry yourself off.");
+        printf("You swim back to shore and claw your way onto dry land.\n\n");
+        printf("You stand up and dry yourself off.\n\n");
         farmersField(player);
     } else if (choice == 2) {
         printf("\nYou look around but you don't see any other way to cross maybe one of the other paths has a way.\n\n");
