@@ -1075,9 +1075,10 @@ int checkAndRemoveItem(Player *player, const char *item) {
         if (strcmp(player->inventory[i], item) == 0) {
             // Remove item by shifting the rest
             for (int j = i; j < player->itemCount - 1; j++) {
-                strncpy(player->inventory[j], player->inventory[j + 1], sizeof(player->inventory[j]));
-            }
-            player->itemCount--;
+    strncpy(player->inventory[j], player->inventory[j + 1], sizeof(player->inventory[j]));
+}
+player->inventory[player->itemCount - 1][0] = '\0'; // Clear the last item
+
             return 1; // Item found and removed
         }
     }
