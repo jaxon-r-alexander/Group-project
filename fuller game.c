@@ -1182,7 +1182,8 @@ void checkActiveQuests(Player *player, struct NPC *npc) {
     }
 }
 void kingEncounter(Player *player){ // Label for the main King encounter logic
-    
+    int choice;
+
     Enemy theKing = {"King", 175, 1};
     
     Room throneRoom = {
