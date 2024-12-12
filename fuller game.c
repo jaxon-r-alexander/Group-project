@@ -521,7 +521,6 @@ void caveEncounter(Player *player) {
     } while (1);
 }
 
-
 void bridgeEncounter(Player *player) {
     Enemy bridgeTroll = {"Bridge Troll", 50, 1};
     Room bridgeRoom = {
@@ -537,7 +536,7 @@ void bridgeEncounter(Player *player) {
     printf("\nYou step into a bright clearing as you come upon a pristine wooden bridge.\n");
     printf("The surrounding area is serene, but the air feels heavy with a sense of foreboding.\n\n");
 
-    do {
+    while (1) {
         printf("What would you like to do?\n");
         printf("1. Inspect the bridge\n");
         printf("2. Cross the bridge quietly\n");
@@ -553,130 +552,66 @@ void bridgeEncounter(Player *player) {
                 break;
 
             case 2:
-                printf("\nYou try to cross the bridge quietly, hoping to avoid any trouble.\n");
-                printf("As you step onto the bridge, a massive figure emerges from beneath it! It's a Bridge Troll!\n");
+            case 4: {
+                printf("\nAs you step onto the bridge, a massive figure emerges from beneath it! It's a Bridge Troll!\n");
                 printf("The troll growls, \"Pay the toll or face my wrath!\"\n\n");
-                goto TrollEncounter; // Proceed to the troll encounter
-                break;
+                combat(player, &bridgeTroll);
+
+                if (!bridgeTroll.isAlive) {
+                    printf("\nThe troll lets out a final roar before collapsing. You carefully step over its massive body.\n\n");
+
+                    if (bridgeRoom.hasItem) {
+                        pickUpItem(player, &bridgeRoom);
+                        printf("\nYou found the Troll's Key on its body! It might be important later.\n\n");
+                    }
+
+                    // Post-encounter options
+                    printf("\nWith the troll defeated, you consider your next move:\n");
+                    do {
+                        printf("1. Return to the farmer\n");
+                        printf("2. Explore the area around the bridge\n");
+                        printf("3. Continue towards the mountains\n");
+                        printf("4. Go back to the main path\n");
+                        printf("Your choice: ");
+                        scanf("%d", &choice);
+
+                        switch (choice) {
+                            case 1:
+                                printf("\nYou decide to return to the farmer to deliver the Troll's Key.\n");
+                                farmersField(player);
+                                return;
+
+                            case 2:
+                                printf("\nYou search the area around the bridge but find nothing of interest.\n");
+                                break; // Continue looping options
+
+                            case 3:
+                                printf("\nYou decide to head towards the mountains.\n");
+                                mountainsEncounter(player);
+                                return;
+
+                            case 4:
+                                printf("\nYou decide to return to the main path.\n");
+                                explorePath(player);
+                                return;
+
+                            default:
+                                printf("\nInvalid choice. Please try again.\n");
+                        }
+                    } while (1);
+                }
+                return; // End encounter if combat concludes
+            }
 
             case 3:
                 printf("\nYou look around the area and notice some bushes and trees near the bridge.\n");
                 printf("After searching for a moment, you find nothing of interest. The area seems clear.\n");
                 break;
 
-            case 4:
-                printf("\nYou step onto the bridge cautiously.\n");
-                printf("As you do, a massive figure emerges from beneath the bridge! It's a Bridge Troll!\n");
-                printf("The troll growls, \"Pay the toll or face my wrath!\"\n\n");
-                goto TrollEncounter; // Proceed to the troll encounter
-                break;
-
             default:
                 printf("\nInvalid choice. Please choose again.\n");
         }
-    } while (choice != 4 && choice != 2);
-
-TrollEncounter: // Label for the main troll encounter logic
-    do {
-        printf("What would you like to do?\n");
-        printf("1. Fight the Bridge Troll\n");
-        printf("2. Attempt to negotiate\n");
-        printf("3. Try to flee\n");
-        printf("Your choice: ");
-        scanf("%d", &choice);
-
-        switch (choice) {
-            case 1:
-                printf("\nYou prepare to fight the troll on the narrow bridge!\n");
-                combat(player, &bridgeTroll);
-                if (!bridgeTroll.isAlive) {
-                    printf("\nThe troll lets out a final roar before collapsing. You carefully step over its massive body.\n\n");
-
-                    // Check if the troll has an item (the key) to collect
-                    if (bridgeRoom.hasItem) {
-                        pickUpItem(player, &bridgeRoom);
-                        printf("\nYou found the Troll's Key on its body! It might be important later.\n\n");
-                    } else {
-                        printf("\nThe troll seems to have nothing of value left.\n\n");
-                    }
-                }
-                return;
-
-            case 2:
-                printf("\nYou try to reason with the troll.\n");
-                if (player->gold >= 20) {
-                    printf("The troll considers your offer and says, \"Fine. 20 gold and I'll let you pass.\"\n");
-                    printf("Do you want to pay the toll? (1 for Yes, 2 for No): ");
-                    int payChoice;
-                    scanf("%d", &payChoice);
-                    if (payChoice == 1) {
-                        player->gold -= 20;
-                        printf("\nYou pay the toll and the troll steps aside, allowing you to pass.\n");
-                        printf("Remaining gold: %d\n\n", player->gold);
-                        return;
-                    } else {
-                        printf("\nThe troll snarls, \"Then you shall face my wrath!\"\n");
-                        combat(player, &bridgeTroll);
-                        if (!bridgeTroll.isAlive) {
-                            printf("\nThe troll lets out a final roar before collapsing. You carefully step over its massive body.\n\n");
-
-                            // Check if the troll has an item (the key) to collect
-                            if (bridgeRoom.hasItem) {
-                                pickUpItem(player, &bridgeRoom);
-                                printf("\nYou found the Troll's Key on its body! It might be important later.\n\n");
-                            } else {
-                                printf("\nThe troll seems to have nothing of value left.\n\n");
-                            }
-                        }
-                        return;
-                    }
-                } else {
-                    printf("\nThe troll laughs at your empty pockets and attacks you!\n");
-                    combat(player, &bridgeTroll);
-                    if (!bridgeTroll.isAlive) {
-                        printf("\nThe troll lets out a final roar before collapsing. You carefully step over its massive body.\n\n");
-
-                        // Check if the troll has an item (the key) to collect
-                        if (bridgeRoom.hasItem) {
-                            pickUpItem(player, &bridgeRoom);
-                            printf("\nYou found the Troll's Key on its body! It might be important later.\n\n");
-                        } else {
-                            printf("\nThe troll seems to have nothing of value left.\n\n");
-                        }
-                    }
-                    return;
-                }
-
-            case 3:
-                printf("\nYou attempt to flee across the bridge!\n");
-                printf("Pick a number (1-3): ");
-                int fleeNumber, correctFleeNumber;
-                scanf("%d", &fleeNumber);
-                correctFleeNumber = rand() % 3 + 1;
-                if (fleeNumber == correctFleeNumber) {
-                    printf("\nYou sprint past the troll and make it across the bridge safely!\n");
-                    return;
-                } else {
-                    printf("\nThe troll blocks your escape and roars, \"Coward! Face me!\"\n");
-                    combat(player, &bridgeTroll);
-                    if (!bridgeTroll.isAlive) {
-                        printf("\nThe troll lets out a final roar before collapsing. You carefully step over its massive body.\n\n");
-
-                        // Check if the troll has an item (the key) to collect
-                        if (bridgeRoom.hasItem) {
-                            pickUpItem(player, &bridgeRoom);
-                            printf("\nYou found the Troll's Key on its body! It might be important later.\n\n");
-                        } else {
-                            printf("\nThe troll seems to have nothing of value left.\n\n");
-                        }
-                    }
-                    return;
-                }
-
-            default:
-                printf("\nInvalid choice. The troll glares at you menacingly.\n");
-        }
-    } while (1);
+    }
 }
 
 
