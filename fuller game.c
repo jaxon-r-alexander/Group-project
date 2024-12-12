@@ -8,6 +8,26 @@
 #define MAX_DESCRIPTION_LENGTH 200
 #define MAX_INVENTORY_SIZE 30
 
+// Function prototypes
+void initializeWoundedSoldier();
+void initializeOldMan();
+void intro(Player *player);
+void Tavern(Player *player);
+void townSquare(Player *player);
+void explorePath(Player *player);
+void farmersField(Player *player);
+void riverCrossing(Player *player);
+void bridgeEncounter(Player *player);
+void kingEncounter(Player *player);
+void lichEncounter(Player *player);
+void combat(Player *player, Enemy *enemy, Room *room);
+void printInventory(Player *player);
+void pickUpItem(Player *player, Room *room);
+void interactWithNPC(Player *player, struct NPC *npc);
+int checkAndRemoveItem(Player *player, const char *item);
+void handleRoomWithEnemies(Player *player, Room *room, Enemy *enemy);
+
+
 typedef struct {
     char name[MAX_NAME_LENGTH];
     int health;
@@ -87,29 +107,6 @@ struct NPC woundedSoldier = {
 
 
 
-void intro(Player *player);
-void Tavern(Player *player);
-void mountainsEncounter(Player *player);
-void explorePath(Player *player);
-void riverCrossing(Player *player);
-void caveEncounter(Player *player, Room *room);
-void farmersField(Player *player);
-void combat(Player *player, Enemy *enemy);
-void printInventory(Player *player);
-void pickUpItem(Player *player, Room *room);
-void unlockRoom(Player *player, Room *room);
-void shop(Player *player);
-void interactWithNPC(Player *player, struct NPC *npc);
-void townSquare(Player *player);
-void oldLadyBridge(Player *player);
-void bridgeEncounter(Player *player);
-void kingEncounter(Player *player);
-void kingdomSquare(Player *player);
-void lichEncounter(Player *player);
-void graveyardSearch(Player *player);
-int findBestWeapon(Player *player);
-void trollEncounter(Player *player, Enemy *enemy, Room *room);
-void handleRoomWithEnemies(Player *player, Room *room, Enemy *enemy)
 
 void initializeWoundedSoldier() {
     strcpy(woundedSoldier.quest.targetItem, "Lich's Head");
