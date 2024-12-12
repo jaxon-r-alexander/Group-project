@@ -364,7 +364,7 @@ void explorePath(Player *player) {
     printf("1. Take the North path, which looks dark and narrow.\n\n");
     printf("2. Take the East path, where you can hear some running water.\n\n");
     printf("3. Take the South path, which looks well worn.\n\n");
-    prinf("4. Go to Dunberry.\n\n")
+    prinf("4. Go to Dunberry.\n\n");
     printf("What do you choose? ");
     scanf("%d", &choice);
 
