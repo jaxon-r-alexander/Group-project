@@ -1118,7 +1118,7 @@ int checkAndRemoveItem(Player *player, const char *item) {
             // Remove item by shifting the rest
             for (int j = i; j < player->itemCount - 1; j++) {
     strncpy(player->inventory[j], player->inventory[j + 1], sizeof(player->inventory[j]));
-}
+} 
 player->inventory[player->itemCount - 1][0] = '\0';
 
             return 1; // Item found and removed
@@ -1254,7 +1254,7 @@ void farmersField(Player *player) {
         }
 }
               
-            if (oldMan.quest.isCompleted && oldMan.hasQuest == 1) {
+           ] if (oldMan.quest.isCompleted && oldMan.hasQuest == 1) {
                     printf("\nThe farmer smiles warmly: \"Thank you, traveler, for retrieving the key. Here's your reward!\"\n");
                     player->gold += oldMan.quest.rewardGold;
                     printf("You received %d gold. Current gold: %d\n", oldMan.quest.rewardGold, player->gold);
