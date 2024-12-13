@@ -856,7 +856,7 @@ void oldLadyBridge(Player *player) {
                     printf("\nShe smiles faintly and adds, \"Good luck, %s.\"\n\n", player->name);
                     hasTalked = 1; // Mark as talked
                 } else {
-                    printf("\nThe old lady says: \"We’ve already spoken, traveler. Be cautious on your journey.\"\n");
+                    printf("\nThe old lady says: \"We have already spoken, traveler. Be cautious on your journey.\"\n");
                 }
                 break;
 
