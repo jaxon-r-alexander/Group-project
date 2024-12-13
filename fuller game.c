@@ -689,6 +689,7 @@ int findBestWeapon(Player *player) {
 }
 
 
+
 void mountainsEncounter(Player *player) {
     int choice;
     int dragonAwake = 0; // Track if the dragon wakes up (0 = sleeping, 1 = awake)
@@ -833,18 +834,14 @@ void mountainsEncounter(Player *player) {
 
 
 void oldLadyBridge(Player *player) {
+    static int hasTalked = 0; // Tracks if the player has already talked to the Old Lady
     int choice;
-    struct NPC oldLady = {
-        .name = "Old Lady",
-        .dialogue = "Ah, traveler, you seem brave enough to face the dangers of this land. Beware, for the mountains hold a fearsome dragon. And just up ahead is the lich king, he kills anyone in his path, be carful.",
-        .hasQuest = 0 // No quest from the old lady
-    };
 
     printf("\nYou approach a rickety wooden bridge swaying gently in the wind. Standing at the center is a frail old woman wrapped in a tattered cloak.\n");
     printf("As you near her, she gazes at you with piercing, wise eyes.\n\n");
 
     do {
-        printf("What would you like to do?\n");
+        printf("What would you like to do?\n\n");
         printf("1. Talk to the old lady\n");
         printf("2. Cross the bridge silently\n");
         printf("3. Turn back\n");
@@ -853,14 +850,19 @@ void oldLadyBridge(Player *player) {
 
         switch (choice) {
             case 1:
-                printf("\nYou approach the old lady.\n");
-                interactWithNPC(player, &oldLady);
-                printf("She smiles faintly and adds, \"Good luck, %s.\"\n\n", player->name);
+                if (!hasTalked) {
+                    printf("\nThe old lady says: \"Ah, traveler, you seem brave enough to face the dangers of this land.\n");
+                    printf("Beware, for the mountains hold a fearsome dragon. And just up ahead is the Lich King, he kills anyone in his path. Be careful.\"\n");
+                    printf("\nShe smiles faintly and adds, \"Good luck, %s.\"\n\n", player->name);
+                    hasTalked = 1; // Mark as talked
+                } else {
+                    printf("\nThe old lady says: \"We’ve already spoken, traveler. Be cautious on your journey.\"\n");
+                }
                 break;
 
             case 2:
                 printf("\nYou decide to cross the bridge silently, nodding politely to the old lady as you pass.\n");
-                printf("Her voice follows you: \"Remember, %s ,not all battles are won by strength alone.\"\n", player->name);
+                printf("Her voice follows you: \"Remember, %s, not all battles are won by strength alone.\"\n", player->name);
                 printf("\nYou make it across the bridge safely.\n\n");
                 graveyardEncounter(player);
                 return;
@@ -875,6 +877,7 @@ void oldLadyBridge(Player *player) {
     } while (1);
 }
 
+
 void combat(Player *player, Enemy *enemy) {
     if (!enemy->isAlive) {
         printf("\nThe %s is already dead.\n\n", enemy->name);
@@ -883,8 +886,6 @@ void combat(Player *player, Enemy *enemy) {
     
     printf("\nA %s lunges from the shadows! It has %d health.\n\n", enemy->name, enemy->health);
     int escapeNumber, dodgeNumber, playerChoice;
-
-
 
     while (enemy->isAlive && player->health > 0) {
         printf("\nCombat Options:\n");
