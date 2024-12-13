@@ -53,7 +53,7 @@ typedef struct {
 } Weapon;
 
 Weapon availableWeapons[] = {
-    {"Fist", 15},
+    {"Fist", 20},
     {"Short Sword", 30},
     {"Long Sword", 40},
     {"Legendary Sword", 50}
@@ -1438,7 +1438,7 @@ void lichEncounter(Player *player) {
 }
 
 
-void kingEncounter(Player *player){ // Label for the main King encounter logic
+void kingEncounter(Player *player){ 
     int choice;
 
     Enemy theKing = {"King", 175, 1};
